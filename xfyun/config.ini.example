@@ -1,0 +1,14 @@
+[xfyun]
+# 讯飞语音识别 API 配置
+# 从 https://console.xfyun.cn/ 获取
+# 详细步骤请参考 XFYUN_GUIDE.md
+
+APPID = 你的APPID
+APISecret = 你的APISecret
+APIKey = 你的APIKey
+
+# 配置说明：
+# 1. 复制本文件为 config.ini
+# 2. 填写从讯飞控制台获取的真实密钥
+# 3. 保存后运行: chmod 600 config.ini（保护密钥安全）
+# 4. 将 config.ini 添加到 .gitignore（避免泄露）
