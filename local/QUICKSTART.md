@@ -4,7 +4,7 @@
 
 ## 前提条件
 
-- Debian 12 / Ubuntu 20.04+
+- Linux 系统（已测试：Debian 12）
 - 已安装 virtualenvwrapper 和 direnv
 - 有可用的麦克风
 

@@ -1,6 +1,94 @@
 # 语音输入工具
 
-Linux 桌面语音转文字解决方案，提供**离线**和**在线**两种方案。
+[![License](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
+[![Python](https://img.shields.io/badge/python-3.8+-green.svg)](https://www.python.org/)
+[![Platform](https://img.shields.io/badge/platform-Linux-lightgrey.svg)](https://www.linux.org/)
+
+**一句话说明：** 在 Linux 上用说话代替打字，实现语音输入文本 🎤 → 📝
+
+## ✨ 特点
+
+- 🚀 **双方案可选**：离线 Whisper + 在线讯飞云，按需切换
+- ⚡ **快捷键操作**：一键启动，即说即得
+- 📋 **自动粘贴**：识别完成自动复制到剪贴板
+- 🎯 **开箱即用**：提供完整安装脚本，5分钟配置完成
+- 🔒 **隐私保护**：支持完全离线的本地识别
+
+## 🎬 使用演示
+
+```
+按 Super+Shift+V → 🎤 说话 → ⏱️ 实时识别 → 📋 自动复制 → Ctrl+V 粘贴
+```
+
+**典型场景：**
+- ✍️ 写文档、记笔记时懒得打字
+- 💬 聊天时快速输入长段文字
+- 📧 写邮件时边想边说
+- 🖥️ 任何需要文字输入的地方
+
+**效果对比：**
+- 传统打字 200 字：约 3-5 分钟
+- 语音输入 200 字：约 1 分钟 ⚡
+
+## 📋 系统要求
+
+### 最低配置
+- **操作系统**：Linux（Debian/Ubuntu/Arch/Fedora 等桌面发行版）
+- **桌面环境**：GNOME（推荐）、KDE、XFCE 等
+- **Python 版本**：3.8 或更高
+- **磁盘空间**：2GB（Whisper 模型）
+- **内存**：4GB RAM
+- **麦克风**：任何 USB 或内置麦克风
+
+### 推荐配置
+- **内存**：8GB RAM
+- **CPU**：4 核心以上（离线识别更快）
+- **网络**：稳定网络连接（使用讯飞云方案时）
+
+### 已测试环境
+- ✅ Debian 12
+
+其他 Linux 发行版（Ubuntu/Arch/Fedora 等）理论上也可用，但未经测试。
+
+## 🚀 5分钟快速开始
+
+### 我该选择哪个方案？
+
+**回答3个问题快速决策：**
+
+1. **你有稳定的网络吗？**
+   - ✅ 有 → 推荐讯飞云（准确率 95%+、速度快）
+   - ❌ 没有 → 选择离线 Whisper
+
+2. **你在意隐私吗？**
+   - ✅ 非常在意 → 离线 Whisper（完全本地）
+   - ⚪ 一般 → 讯飞云（体验更好）
+
+3. **你需要长文本输入吗？**
+   - ✅ 需要（>10秒） → 讯飞云（无时长限制）
+   - ❌ 不需要 → 离线 Whisper 足够
+
+### 开始安装（3选1）
+
+**方案 A：只装讯飞云（推荐新手）** ⭐
+```bash
+cd ~/bin/tools/voice_input/xfyun
+./setup_xfyun.sh
+# 跟随提示注册账号、获取密钥、配置
+```
+👉 [详细步骤](./xfyun/XFYUN_QUICKSTART.md)
+
+**方案 B：只装离线 Whisper**
+```bash
+# 查看完整安装指南
+cat ~/bin/tools/voice_input/local/INSTALL.md
+```
+👉 [详细步骤](./local/QUICKSTART.md)
+
+**方案 C：都装（最灵活）**
+先安装离线方案（基础环境），再添加讯飞云增强。
+
+---
 
 ## 方案选择
 
@@ -131,6 +219,80 @@ Super+V → 弹出终端 → 🎤录音 → 说话 → 停顿2秒 → 识别中.
 
 ---
 
+## 📖 实际使用示例
+
+### 场景1：写工作日报
+
+**传统方式：** 键盘打字 5 分钟，写 200 字
+**使用语音输入：** 说话 1 分钟 ⚡
+
+```
+操作步骤：
+1. 打开文本编辑器
+2. 按 Super+Shift+V 启动语音输入
+3. 说话："今天完成了用户登录模块的开发，修复了三个bug，
+   包括密码验证逻辑错误、session超时处理和前端表单校验问题。
+   明天计划开始用户权限管理模块的设计。"
+4. 按 Ctrl+C 停止录音
+5. 按 Ctrl+V 粘贴到编辑器
+6. ✅ 完成！自动带标点符号
+```
+
+### 场景2：回复长邮件
+
+**传统方式：** 打字 10 分钟
+**使用语音输入：** 说话 3 分钟 ⚡
+
+```
+特别适合：
+- 需要详细解释的技术邮件
+- 项目进度汇报
+- 客户需求沟通
+```
+
+### 场景3：聊天输入长文本
+
+**微信/QQ/Telegram 等聊天工具都能用**
+
+```
+1. 在聊天窗口点击输入框
+2. 按 Super+Shift+V
+3. 说出你想发送的内容
+4. Ctrl+C 停止，Ctrl+V 粘贴
+5. 发送
+```
+
+### 场景4：写技术文档
+
+**边想边说，思路更流畅**
+
+```
+传统：想 → 组织语言 → 打字（思维中断）
+语音：想 → 直接说出来 → 粘贴（思维连贯）
+
+特别适合：
+- API 文档说明
+- 操作步骤记录
+- 设计思路整理
+```
+
+### 场景5：会议记录
+
+**实时记录会议要点**
+
+```
+会议中：
+- 按 Super+Shift+V
+- 听到重要内容时复述一遍
+- Ctrl+C 停止
+- Ctrl+V 粘贴到文档
+- 继续听会议
+
+比纯手打快 3-5 倍！
+```
+
+---
+
 ## 配置和优化
 
 详细的配置调整和使用技巧请查看各方案文档：
@@ -153,17 +315,99 @@ Super+V → 弹出终端 → 🎤录音 → 说话 → 停顿2秒 → 识别中.
 
 ---
 
-## 常见问题
+## ⚠️ 常见问题与故障排查
 
-### 快速排查
+### 快速排查表
 
-| 问题 | 解决方案 | 详细文档 |
-|------|---------|----------|
-| 离线方案首次很慢 | 正常，下载模型需时 | [local/INSTALL.md](./local/INSTALL.md) |
-| 讯飞连接失败 | 检查密钥和网络 | [xfyun/XFYUN_GUIDE.md](./xfyun/XFYUN_GUIDE.md) |
-| 识别不准确 | 升级模型或换方案 | 各方案文档 |
-| 无法录音 | 检查麦克风权限 | 两个方案通用 |
-| 快捷键不工作 | 检查脚本路径和权限 | [local/INSTALL.md](./local/INSTALL.md) |
+| 症状 | 可能原因 | 快速解决方案 | 详细文档 |
+|------|---------|------------|----------|
+| 🎤 录音失败/"无法打开麦克风" | 麦克风权限/驱动 | 运行 `arecord -l` 检查麦克风 | [麦克风问题](#麦克风问题) |
+| 🌐 讯飞连接失败 | API密钥错误/网络 | 检查 `xfyun/config.ini` 密钥 | [xfyun/XFYUN_GUIDE.md#Q1](./xfyun/XFYUN_GUIDE.md#常见问题) |
+| 🐌 离线识别很慢（>10秒） | CPU性能不足/模型太大 | 换用 tiny 模型：编辑脚本 `model="tiny"` | [local/INSTALL.md#性能优化](./local/INSTALL.md) |
+| ❌ 无法粘贴/剪贴板为空 | xclip 未安装 | 运行 `sudo apt install xclip` | [系统依赖](#系统依赖) |
+| ⌨️ 快捷键不工作 | 脚本权限/路径错误 | 运行 `chmod +x ~/bin/tools/voice_input/*/*.sh` | [local/INSTALL.md#配置快捷键](./local/INSTALL.md) |
+| 📝 识别结果无标点 | 使用了离线方案/讯飞服务未开通 | 切换到讯飞云方案 | [方案对比](#方案选择) |
+| 🔄 识别结果重复/乱码 | 网络问题/WebSocket异常 | 重启终端，重新运行脚本 | [xfyun/XFYUN_GUIDE.md](./xfyun/XFYUN_GUIDE.md) |
+| 💾 离线模型下载失败 | 网络问题/磁盘空间不足 | 检查磁盘空间 `df -h`，清理空间后重试 | [local/INSTALL.md](./local/INSTALL.md) |
+| 🚫 "ModuleNotFoundError" | Python包未安装/虚拟环境未激活 | 运行 `workon voice_input` 激活环境 | [环境配置](#环境配置) |
+| 🎯 识别准确率低 | 环境嘈杂/口音问题/模型不适合 | 在安静环境使用，或切换方案 | [提高准确率](#提高准确率) |
+
+### 详细故障排查
+
+#### 麦克风问题
+
+**检查麦克风是否被识别：**
+```bash
+# 列出所有音频设备
+arecord -l
+
+# 测试录音（录5秒）
+arecord -d 5 test.wav
+
+# 播放测试
+aplay test.wav
+```
+
+**常见解决方案：**
+- Ubuntu/Debian: `sudo apt install alsa-utils pulseaudio`
+- 权限问题: `sudo usermod -aG audio $USER`（需要重新登录）
+
+#### 环境配置
+
+**检查虚拟环境：**
+```bash
+# 查看是否在虚拟环境中
+which python
+# 应显示：/home/用户名/.virtualenvs/voice_input/bin/python
+
+# 激活虚拟环境
+workon voice_input
+
+# 检查已安装的包
+pip list | grep -E "(whisper|torch|pyaudio|websocket)"
+```
+
+#### 系统依赖
+
+**安装缺失的依赖：**
+```bash
+# Debian/Ubuntu
+sudo apt update
+sudo apt install xclip portaudio19-dev python3-dev
+
+# Arch Linux
+sudo pacman -S xclip portaudio python
+```
+
+#### 提高准确率
+
+**离线方案：**
+- 升级模型：tiny → base → small → medium
+- 在安静环境使用
+- 说话清晰，速度适中
+
+**讯飞云方案：**
+- 检查网络连接稳定性
+- 在安静环境使用
+- 说话清晰，避免方言
+
+### 获取帮助
+
+如果以上方法都无法解决问题：
+
+1. 📖 查看详细文档：
+   - [离线方案完整指南](./local/INSTALL.md)
+   - [讯飞云完整指南](./xfyun/XFYUN_GUIDE.md)
+
+2. 🐛 提交问题：
+   - [GitHub Issues](https://github.com/MuyaoWorkshop/linux-voice-input/issues)
+   - [Gitee Issues](https://gitee.com/muyaoworkshop/linux-voice-input/issues)
+
+3. 📋 提交时请包含：
+   - 操作系统版本：`cat /etc/os-release`
+   - Python版本：`python3 --version`
+   - 错误信息截图或日志
+   - 复现步骤
 
 ### 方案选择建议
 
@@ -231,6 +475,70 @@ Super+V → 弹出终端 → 🎤录音 → 说话 → 停顿2秒 → 识别中.
 - **环境管理**: virtualenvwrapper + direnv
 - **桌面环境**: GNOME (其他桌面需调整快捷键配置)
 - **系统**: Linux (Debian/Ubuntu)
+
+---
+
+## 📚 术语解释（新手可选阅读）
+
+如果你是Linux新手，可能对一些技术术语不熟悉。这里做简单解释：
+
+| 术语 | 解释 | 你需要知道的 |
+|------|------|------------|
+| **Whisper** | OpenAI 开发的离线语音识别AI模型 | 就像手机上的语音助手，但完全在你电脑上运行 |
+| **讯飞云** | 科大讯飞提供的在线语音识别服务 | 类似百度、搜狗的语音输入，需要联网 |
+| **virtualenv** | Python虚拟环境，隔离项目依赖 | 避免不同Python项目之间冲突，不用管细节 |
+| **xclip** | Linux剪贴板工具 | 让程序能把文字复制到剪贴板 |
+| **PyAudio** | Python录音库 | 让Python程序能录音 |
+| **WebSocket** | 实时双向通信协议 | 让你的电脑和讯飞服务器实时传输语音 |
+| **API密钥** | 访问讯飞服务的"钥匙" | 免费申请，证明你有权使用讯飞服务 |
+| **Super键** | Windows键 | 键盘上带Windows图标的键 |
+
+**总之：** 新手不需要深入理解这些，跟着安装步骤操作即可。
+
+---
+
+## 🗑️ 卸载方法
+
+### 完全卸载
+
+如果你决定不再使用这个工具，可以完全删除：
+
+```bash
+# 1. 删除项目文件
+rm -rf ~/bin/tools/voice_input
+
+# 2. 删除 Python 虚拟环境
+rmvirtualenv voice_input
+
+# 3. 删除快捷键
+# 方法A：通过GNOME设置（推荐）
+# 设置 → 键盘 → 查看和自定义快捷键 → 删除"语音输入"相关项
+
+# 方法B：命令行删除
+gsettings set org.gnome.settings-daemon.plugins.media-keys custom-keybindings "[]"
+
+# 4. （可选）卸载系统依赖
+# 注意：这些工具可能被其他程序使用，请谨慎删除
+sudo apt remove xclip portaudio19-dev
+# 或 Arch: sudo pacman -R xclip portaudio
+```
+
+### 只卸载某个方案
+
+```bash
+# 只删除讯飞云方案
+rm -rf ~/bin/tools/voice_input/xfyun
+
+# 只删除离线方案（保留讯飞云）
+rm -rf ~/bin/tools/voice_input/local
+```
+
+### 卸载后
+
+- ✅ 不会影响系统其他功能
+- ✅ Python虚拟环境被删除，不占用磁盘
+- ✅ 快捷键失效
+- ✅ 如果想恢复，重新安装即可
 
 ---
 

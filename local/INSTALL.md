@@ -1,6 +1,6 @@
 # 语音输入工具 - 完整安装指南
 
-基于 OpenAI Whisper 的离线语音转文字工具，适用于 Linux (Debian/Ubuntu) 系统。
+基于 OpenAI Whisper 的离线语音转文字工具，适用于 Linux 系统（已测试：Debian 12）。
 
 ## 目录
 
@@ -22,7 +22,7 @@
 - **麦克风**: 可用的音频输入设备
 
 ### 软件要求
-- **系统**: Debian 12 / Ubuntu 20.04+ 或其他 Linux 发行版
+- **系统**: Debian 12（已测试）。其他 Linux 发行版（Ubuntu/Arch/Fedora 等）理论上可用，但未经测试
 - **桌面**: GNOME (本文档基于 GNOME，其他桌面环境需调整快捷键配置)
 - **Python**: 3.8+
 - **Shell**: bash / zsh
