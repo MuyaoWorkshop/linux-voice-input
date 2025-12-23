@@ -104,6 +104,69 @@ pip list | grep -E "(whisper|torch|pyaudio)"
 
 完成！现在你可以随时使用 `Super + V` 进行语音输入了。
 
+## 🚀 可选：启用守护进程模式（极速启动）
+
+如果你希望启动速度从 4-5 秒提升到 <0.5 秒，可以启用守护进程模式：
+
+### 什么是守护进程模式？
+
+- **普通模式**（当前）：按快捷键时加载模型（4-5秒）
+- **守护进程模式**：后台常驻，预加载模型（<0.5秒）✨
+
+### 启用守护进程模式
+
+```bash
+# 1. 安装额外依赖（繁简转换）
+workon voice_input
+pip install opencc-python-reimplemented
+
+# 2. 切换到守护进程模式
+cd ~/bin/tools/voice_input/local
+./switch_mode.sh daemon
+```
+
+### 效果对比
+
+**普通模式**：
+```
+按 Super+V → 等待 4-5秒 → 开始录音
+```
+
+**守护进程模式**：
+```
+按 Super+V → 立即开始录音 (<0.5秒) 🚀
+             + 实时音量条显示
+             + 静音倒计时
+```
+
+### 资源占用
+
+- **内存**: ~900MB 常驻
+- **CPU**: ~1.6%（空闲时）
+- **适合**: 频繁使用（日均 10+ 次）
+
+### 模式切换
+
+```bash
+# 查看当前模式
+./switch_mode.sh status
+
+# 切换到守护进程模式（快速）
+./switch_mode.sh daemon
+
+# 切换到普通模式（节省内存）
+./switch_mode.sh normal
+
+# 自动切换
+./switch_mode.sh toggle
+```
+
+### 了解更多
+
+详细技术文档：[守护进程优化：从 4 秒到 0.5 秒](../docs/DAEMON_OPTIMIZATION.md)
+
+---
+
 ## 支持与反馈
 
 - **项目地址**: https://github.com/MuyaoWorkshop/linux-voice-input

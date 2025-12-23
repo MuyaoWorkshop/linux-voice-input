@@ -508,8 +508,241 @@ sudo apt remove portaudio19-dev xdotool xclip
 
 ---
 
+## 🚀 守护进程模式（性能优化）
+
+### 概述
+
+离线 Whisper 方案支持两种运行模式：
+
+| 模式 | 启动方式 | 启动速度 | 内存占用 | 适用场景 |
+|------|---------|---------|---------|---------|
+| **普通模式** | 按需加载模型 | 4-5 秒 | 0MB 常驻 | 偶尔使用（日均 1-2 次） |
+| **守护进程模式** | 后台常驻 | <0.5 秒 🚀 | ~900MB 常驻 | 频繁使用（日均 10+ 次） |
+
+### 守护进程模式优势
+
+1. **极速启动**：<0.5 秒响应，比普通模式快 **87.5%**
+2. **实时反馈**：
+   - 🎤 实时音量条显示
+   - ⏸️ 静音倒计时
+   - 📊 识别进度提示
+3. **开机自启**：无需手动管理
+4. **低 CPU 占用**：空闲时仅 ~1.6%
+
+### 安装守护进程模式
+
+#### 1. 安装额外依赖
+
+```bash
+workon voice_input
+pip install opencc-python-reimplemented numpy
+```
+
+**依赖说明**：
+- `opencc-python-reimplemented`: 繁简转换（修复 Whisper 输出繁体的问题）
+- `numpy`: 音量计算优化
+
+#### 2. 切换到守护进程模式
+
+```bash
+cd ~/bin/tools/voice_input/local
+./switch_mode.sh daemon
+```
+
+输出示例：
+```
+=== 切换到守护进程模式 ===
+
+1. 启动守护进程...
+   ✓ 守护进程已启动
+2. 更新快捷键配置...
+   ✓ 快捷键已更新为守护进程模式
+
+=== 切换完成 ===
+
+守护进程模式特点：
+  ✓ 启动速度极快 (<0.5秒)
+  ✓ 实时音量条显示
+  ⚠ 常驻内存 (~900MB)
+
+现在按 Super+V 试试，应该能立即开始录音！
+```
+
+### 使用效果对比
+
+**普通模式**：
+```
+按 Super+V
+  ↓ (等待 4-5秒加载模型...)
+🎤 开始录音...
+.....
+录音结束
+⏳ 正在识别...
+识别结果: xxx
+```
+
+**守护进程模式**：
+```
+按 Super+V
+  ↓ (<0.5秒立即响应)
+✓ 已连接到守护进程
+🎤 开始录音...
+✓ 检测到声音，开始记录...
+🎤 [████████████░░░░░░░░░░░░░░░░░░] 60%  ← 实时音量条
+⏸️  静音检测中... 还剩 2.1 秒          ← 停顿倒计时
+✓ 检测到 3.0 秒静音，停止录音
+⏳ 正在识别...
+📋 识别结果: xxx
+✓ 完成！总耗时: 8.5秒
+```
+
+### 管理守护进程
+
+#### 查看状态
+
+```bash
+# 方法 1：使用切换脚本
+./switch_mode.sh status
+
+# 方法 2：使用 systemctl
+systemctl --user status voice-input-daemon
+```
+
+输出示例：
+```
+=== 当前语音输入模式 ===
+
+快捷键模式: 守护进程模式 (快速)
+守护进程状态: 运行中
+资源占用: CPU 1.6%, 内存 911MB
+```
+
+#### 启动/停止/重启
+
+```bash
+# 启动
+systemctl --user start voice-input-daemon
+
+# 停止
+systemctl --user stop voice-input-daemon
+
+# 重启
+systemctl --user restart voice-input-daemon
+
+# 开机自启动（切换时自动设置）
+systemctl --user enable voice-input-daemon
+
+# 禁用开机自启动
+systemctl --user disable voice-input-daemon
+```
+
+#### 查看日志
+
+```bash
+# 实时查看日志
+journalctl --user -u voice-input-daemon -f
+
+# 查看最近 50 行
+journalctl --user -u voice-input-daemon -n 50
+
+# 查看今天的日志
+journalctl --user -u voice-input-daemon --since today
+```
+
+### 模式切换
+
+#### 切换到普通模式（释放内存）
+
+```bash
+./switch_mode.sh normal
+```
+
+这会：
+1. 停止守护进程
+2. 禁用开机自启动
+3. 更新快捷键为普通模式
+
+#### 自动切换
+
+```bash
+./switch_mode.sh toggle
+```
+
+自动判断当前模式并切换到另一个。
+
+### 资源占用详情
+
+**守护进程模式资源占用（空闲状态）**：
+
+| 资源 | 占用 | 说明 |
+|------|------|------|
+| **内存** | ~900MB | Whisper base 模型 + Python 运行时 |
+| **CPU** | ~1.6% | 使用 select() 优化，几乎可忽略 |
+| **磁盘 I/O** | 0 | 模型常驻内存，无磁盘读写 |
+| **网络** | 0 | 完全本地，无网络通信 |
+
+**工作状态资源占用**：
+- CPU：录音时 ~20-30%，识别时 ~150%（多核）
+- 内存：峰值 ~1GB
+
+### 技术原理
+
+想深入了解守护进程模式的实现原理？
+
+👉 **[守护进程优化：从 4 秒到 0.5 秒](../docs/DAEMON_OPTIMIZATION.md)**
+
+**技术文档内容**：
+- 性能瓶颈分析（模型加载耗时 3.5 秒）
+- 解决方案设计（守护进程 vs 其他方案）
+- 架构设计（Unix Socket 通信）
+- 实现细节（Python + systemd）
+- 性能优化过程（CPU 占用 10% → 1.6%）
+- 适合初学者的详细讲解
+
+### 常见问题
+
+**Q: 守护进程模式值得吗？**
+
+A: 如果你：
+- ✅ 每天使用 10+ 次 → 每月节省 45 分钟
+- ✅ 内存充足（16GB+）→ 900MB 占用可忽略
+- ✅ 追求体验 → 即按即用，思路不被打断
+
+那么**非常值得**！用 5.6% 内存换回每年 8+ 小时生命。
+
+**Q: 会影响其他程序性能吗？**
+
+A: 不会。空闲时 CPU 占用仅 1.6%，对其他程序几乎无影响。
+
+**Q: 如何确认守护进程正常工作？**
+
+A: 按 `Super+V` 后：
+1. 如果立即（<0.5秒）打开终端 → 守护进程正常
+2. 如果等待 4-5 秒 → 守护进程未运行，运行 `./switch_mode.sh daemon`
+
+**Q: 崩溃了怎么办？**
+
+A: systemd 会自动重启。如果持续崩溃，查看日志：
+```bash
+journalctl --user -u voice-input-daemon -n 50
+```
+
+**Q: 如何完全卸载守护进程模式？**
+
+A:
+```bash
+# 切换到普通模式
+./switch_mode.sh normal
+
+# 删除守护进程文件（可选）
+rm -f ~/.config/systemd/user/voice-input-daemon.service
+systemctl --user daemon-reload
+```
+
+---
+
 ## 支持
 
 - **项目地址**: https://github.com/MuyaoWorkshop/linux-voice-input
 - **问题反馈**: https://github.com/MuyaoWorkshop/linux-voice-input/issues
-- **文档更新**: 2025-12-22
+- **文档更新**: 2025-12-23
