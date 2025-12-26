@@ -37,3 +37,6 @@ Thumbs.db
 
 # 测试输出
 test_output/
+
+# 动态生成的文件
+trigger.py

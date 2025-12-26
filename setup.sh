@@ -272,6 +272,174 @@ EOF
         if systemctl --user is-active voice-input-daemon &> /dev/null; then
             print_success "守护进程已启动"
             DAEMON_ENABLED=true
+
+            # 生成轻量级触发器脚本（极速启动）
+            print_info "正在生成触发器脚本 trigger.py..."
+            cat > "$PROJECT_DIR/trigger.py" << 'TRIGGER_EOF'
+#!/usr/bin/env python3
+"""语音输入触发器 - 极速启动 (<0.1秒)"""
+import os, sys, socket, json, time
+
+# Tkinter
+USE_TKINTER = False
+try:
+    import tkinter as tk
+    from tkinter import ttk
+    USE_TKINTER = True
+except ImportError:
+    pass
+
+SOCKET_PATH = "/tmp/voice_input_daemon.sock"
+
+# UI 配置
+WINDOW_WIDTH, WINDOW_HEIGHT = 700, 280
+FONT_FAMILY, FONT_SIZE_TITLE, FONT_SIZE_VOLUME, FONT_SIZE_TEXT, FONT_SIZE_TIP = "Helvetica", 16, 11, 12, 10
+COLOR_BG, COLOR_BORDER, COLOR_TEXT_PRIMARY, COLOR_TEXT_SECONDARY = '#f8f8f8', '#d0d0d0', '#1d1d1f', '#86868b'
+COLOR_SUCCESS, COLOR_ERROR, COLOR_PROGRESS_BG = '#34c759', '#ff3b30', '#e5e5e7'
+VOLUME_BAR_LENGTH, VOLUME_BAR_THICKNESS, AUTO_CLOSE_DELAY = 500, 18, 1000
+
+class VoiceInputUI:
+    def __init__(self):
+        self.mode = "gui" if USE_TKINTER else "terminal"
+        if self.mode == "gui": self._init_gui()
+        else: print("🎤 语音输入 (快速模式)\n" + "="*50)
+
+    def _init_gui(self):
+        self.root = tk.Tk()
+        self.root.title("🎤 语音输入")
+        self.root.attributes('-topmost', True)
+        self.root.resizable(False, False)
+        self.root.overrideredirect(True)
+        self.root.configure(bg=COLOR_BORDER)
+        x, y = (self.root.winfo_screenwidth()-WINDOW_WIDTH)//2, (self.root.winfo_screenheight()-WINDOW_HEIGHT)//2
+        self.root.geometry(f"{WINDOW_WIDTH}x{WINDOW_HEIGHT}+{x}+{y}")
+        self.root.update(); self.root.lift(); self.root.focus_force()
+
+        style = ttk.Style(); style.theme_use('clam')
+        frame = tk.Frame(self.root, bg=COLOR_BG, highlightthickness=0)
+        frame.pack(fill=tk.BOTH, expand=True, padx=2, pady=2)
+
+        self.status_label = tk.Label(frame, text="🎤 正在录音...", font=(FONT_FAMILY, FONT_SIZE_TITLE),
+                                     fg=COLOR_TEXT_PRIMARY, bg=COLOR_BG, wraplength=660, justify=tk.CENTER)
+        self.status_label.pack(pady=18)
+
+        vf = tk.Frame(frame, bg=COLOR_BG); vf.pack(pady=14)
+        tk.Label(vf, text="音量", font=(FONT_FAMILY, FONT_SIZE_VOLUME), fg=COLOR_TEXT_SECONDARY,
+                bg=COLOR_BG, width=4).pack(side=tk.LEFT, padx=(20,10))
+        self.volume_bar = ttk.Progressbar(vf, length=VOLUME_BAR_LENGTH, mode='determinate',
+                                         style='Apple.Horizontal.TProgressbar')
+        self.volume_bar.pack(side=tk.LEFT, padx=10)
+        style.configure('Apple.Horizontal.TProgressbar', troughcolor=COLOR_PROGRESS_BG,
+                       background=COLOR_SUCCESS, borderwidth=0, thickness=VOLUME_BAR_THICKNESS)
+        self.volume_label = tk.Label(vf, text="0%", font=(FONT_FAMILY, FONT_SIZE_VOLUME),
+                                     width=8, anchor=tk.W, fg=COLOR_SUCCESS, bg=COLOR_BG)
+        self.volume_label.pack(side=tk.LEFT, padx=(10,25))
+
+        self.text_label = tk.Label(frame, text="", font=(FONT_FAMILY, FONT_SIZE_TEXT),
+                                   wraplength=660, fg=COLOR_TEXT_PRIMARY, bg=COLOR_BG, justify=tk.CENTER)
+        self.text_label.pack(pady=14)
+
+        self.tip_label = tk.Label(frame, text="按 Ctrl+C 停止录音",
+                                 font=(FONT_FAMILY, FONT_SIZE_TIP), fg=COLOR_TEXT_SECONDARY, bg=COLOR_BG)
+        self.tip_label.pack(pady=10)
+        self.root.protocol("WM_DELETE_WINDOW", lambda: (self.root.destroy(), os._exit(0)))
+
+    def update_volume(self, v):
+        if self.mode == "gui":
+            try: self.volume_bar['value'], self.volume_label['text'] = v, f"{int(v)}%"; self.root.update()
+            except: pass
+        else:
+            bar = "▓"*int(v/100*30) + "░"*(30-int(v/100*30))
+            print(f"\r音量: {bar} {int(v):3d}%", end="", flush=True)
+
+    def show_status(self, s, c=None):
+        if self.mode == "gui":
+            try: self.status_label.config(text=s, fg=c or COLOR_TEXT_PRIMARY); self.root.update()
+            except: pass
+        else: print(f"\n{s}")
+
+    def show_result(self, text, success=True):
+        if self.mode == "gui":
+            try:
+                self.status_label.config(text="✅ 识别完成" if success else "❌ 识别失败",
+                                        fg=COLOR_SUCCESS if success else COLOR_ERROR)
+                self.text_label.config(text=text, fg=COLOR_TEXT_PRIMARY if success else COLOR_ERROR)
+                self.tip_label.config(text=f"窗口将在 {AUTO_CLOSE_DELAY/1000:.0f} 秒后自动关闭...", fg=COLOR_TEXT_SECONDARY)
+                self.root.update(); self.root.after(AUTO_CLOSE_DELAY, self.close)
+            except: pass
+        else: print(f"\n\n{'✅ 识别完成' if success else '❌ 识别失败'}\n结果: {text}")
+
+    def close(self):
+        if self.mode == "gui":
+            try: self.root.quit(); self.root.destroy()
+            except: pass
+        else: print("\n" + "="*50)
+
+def trigger():
+    if not os.path.exists(SOCKET_PATH):
+        ui = VoiceInputUI()
+        msg = "守护进程未运行\n请先启动: systemctl --user start voice-input-daemon"
+        print(f"❌ {msg}"); ui.show_result(msg, False); time.sleep(2); ui.close()
+        return False
+
+    try:
+        sock = socket.socket(socket.AF_UNIX, socket.SOCK_STREAM)
+        sock.connect(SOCKET_PATH); sock.sendall(b"RECORD")
+        ui = VoiceInputUI()
+        print("✓ 已连接到守护进程\n"); ui.show_status("🎤 正在录音...")
+
+        buffer, recording_active = "", False
+        while True:
+            data = sock.recv(1024)
+            if not data: break
+            buffer += data.decode('utf-8')
+
+            while '\n' in buffer:
+                line, buffer = buffer.split('\n', 1)
+                if not line.strip(): continue
+                try:
+                    d = json.loads(line)
+                    msg, st = d.get('message',''), d.get('status','')
+
+                    if st == 'recording_active' and ':' in msg:
+                        v = int(msg.split(':')[1]); ui.update_volume(v)
+                        bar = "█"*int(v/100*30) + "░"*(30-int(v/100*30))
+                        print(f"\r🎤 [{bar}] {v}%", end="", flush=True)
+                        recording_active = True
+                    elif st == 'recording_silence' and ':' in msg:
+                        r = msg.split(':')[1]
+                        ui.show_status(f"🎤 录音中... (静音 {r}s 后结束)")
+                        print(f"\r⏸️  静音检测中... 还剩 {r} 秒", end="", flush=True)
+                    elif st == 'speaking':
+                        if recording_active: print()
+                        ui.show_status("🎤 正在录音... (检测到声音)"); print(msg); recording_active = True
+                    elif st == 'recording_stopped':
+                        if recording_active: print()
+                        ui.show_status("✓ 录音结束"); print(msg); recording_active = False
+                    elif st in ['recording','recognizing','copying']:
+                        if recording_active: print(); recording_active = False
+                        if st == 'recognizing': ui.show_status("⏳ 正在识别...")
+                        elif st == 'copying': ui.show_status("✓ 正在复制...")
+                        print(msg)
+                    elif st in ['done','error']:
+                        if recording_active: print()
+                        print(msg)
+                        ui.show_result(msg, st=='done'); time.sleep(1 if st=='done' else 2)
+                        ui.close(); sock.close()
+                        return st == 'done'
+                    elif msg: print(msg)
+                except: pass
+        sock.close(); ui.close()
+        return True
+    except Exception as e:
+        ui = VoiceInputUI()
+        msg = f"错误: {e}"; print(f"❌ {msg}"); ui.show_result(msg, False); time.sleep(2); ui.close()
+        return False
+
+if __name__ == "__main__": sys.exit(0 if trigger() else 1)
+TRIGGER_EOF
+            chmod +x "$PROJECT_DIR/trigger.py"
+            print_success "触发器脚本已生成: trigger.py (极速启动 <0.1秒)"
         else
             print_error "守护进程启动失败"
             print_info "查看日志: journalctl --user -u voice-input-daemon -f"
@@ -299,11 +467,11 @@ EOF
 
     # 确定要使用的命令
     if [ "$DAEMON_ENABLED" = true ]; then
-        SHORTCUT_CMD="$PROJECT_DIR/voice_input.py --trigger"
-        SHORTCUT_DESC="语音输入 (快速模式)"
+        SHORTCUT_CMD="$PROJECT_DIR/trigger.py"
+        SHORTCUT_DESC="语音输入 (快速模式 <0.1秒)"
     else
         SHORTCUT_CMD="$PROJECT_DIR/voice_input.py"
-        SHORTCUT_DESC="语音输入"
+        SHORTCUT_DESC="语音输入 (普通模式)"
     fi
 
     if [ "$DESKTOP" = "gnome" ]; then
