@@ -329,7 +329,9 @@ class VoiceInputUI:
             except:
                 pass
         else:
-            print(f"\n{status}")
+            # 终端模式：在同一行刷新状态
+            # 清除当前行并打印新状态，不换行
+            print(f"\r{status:<80}", end="", flush=True)
 
     def show_result(self, text, success=True):
         """显示最终结果"""
@@ -439,7 +441,9 @@ class VoiceInputNormal:
                     self.ui.show_status("🎤 正在录音... (检测到声音)")
                     started_speaking = True
                 silent_chunks = 0
-                print(".", end="", flush=True)
+                # 只在 GUI 模式打点，终端模式通过 update_volume 显示
+                if self.ui.mode == "gui":
+                    print(".", end="", flush=True)
             elif started_speaking:
                 silent_chunks += 1
                 remaining = max(0, SILENCE_DURATION - (silent_chunks * CHUNK / SAMPLE_RATE))
@@ -447,7 +451,7 @@ class VoiceInputNormal:
                     self.ui.show_status(f"🎤 录音中... (静音 {remaining:.1f}s 后结束)")
 
             if started_speaking and silent_chunks > max_silent_chunks:
-                print(f"\n✓ 检测到 {SILENCE_DURATION} 秒静音，停止录音")
+                print(f"\n\n✓ 检测到 {SILENCE_DURATION} 秒静音，停止录音")
                 self.ui.show_status("✓ 录音结束")
                 break
 
