@@ -296,7 +296,7 @@ WINDOW_WIDTH, WINDOW_HEIGHT = 700, 280
 FONT_FAMILY, FONT_SIZE_TITLE, FONT_SIZE_VOLUME, FONT_SIZE_TEXT, FONT_SIZE_TIP = "Helvetica", 16, 11, 12, 10
 COLOR_BG, COLOR_BORDER, COLOR_TEXT_PRIMARY, COLOR_TEXT_SECONDARY = '#f8f8f8', '#d0d0d0', '#1d1d1f', '#86868b'
 COLOR_SUCCESS, COLOR_ERROR, COLOR_PROGRESS_BG = '#34c759', '#ff3b30', '#e5e5e7'
-VOLUME_BAR_LENGTH, VOLUME_BAR_THICKNESS, AUTO_CLOSE_DELAY = 500, 18, 1000
+VOLUME_BAR_LENGTH, VOLUME_BAR_THICKNESS, AUTO_CLOSE_DELAY = 420, 18, 1000
 
 class VoiceInputUI:
     def __init__(self):
@@ -540,7 +540,7 @@ TRIGGER_EOF
     if [ "$DAEMON_ENABLED" = true ]; then
         echo "2️⃣  守护进程服务（已启动）："
         echo "   • 服务文件: ~/.config/systemd/user/voice-input-daemon.service"
-        echo "   • 当前状态: ${GREEN}运行中${NC}"
+        echo -e "   • 当前状态: ${GREEN}运行中${NC}"
         echo "   • 查看状态: systemctl --user status voice-input-daemon"
         echo "   • 查看日志: journalctl --user -u voice-input-daemon -f"
     else
@@ -552,17 +552,17 @@ TRIGGER_EOF
 
     echo "3️⃣  快捷键："
     if [ "$DESKTOP" = "gnome" ]; then
-        echo "   • ${GREEN}已自动配置${NC} Super+V"
+        echo -e "   • ${GREEN}已自动配置${NC} Super+V"
     else
-        echo "   • ${YELLOW}需手动配置${NC} Super+V"
+        echo -e "   • ${YELLOW}需手动配置${NC} Super+V"
     fi
     echo ""
 
     echo "4️⃣  界面模式："
     if [ "$TK_AVAILABLE" = true ]; then
-        echo "   • ${GREEN}图形界面 (Tkinter)${NC}"
+        echo -e "   • ${GREEN}图形界面 (Tkinter)${NC}"
     else
-        echo "   • ${YELLOW}终端模式${NC}"
+        echo -e "   • ${YELLOW}终端模式${NC}"
         echo "     提示: 安装 python3-tk 可启用图形界面"
     fi
     echo ""

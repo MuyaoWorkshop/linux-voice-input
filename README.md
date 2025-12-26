@@ -3,14 +3,17 @@
 [![License](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
 [![Python](https://img.shields.io/badge/python-3.8+-green.svg)](https://www.python.org/)
 [![Platform](https://img.shields.io/badge/platform-Linux-lightgrey.svg)](https://www.linux.org/)
+[![Version](https://img.shields.io/badge/version-v3.0.0-brightgreen.svg)](https://github.com/MuyaoWorkshop/linux-voice-input)
 
 **一句话说明：** 在 Linux 上用说话代替打字，实现语音输入文本 🎤 → 📝
+
+> **v3.0 极简版**：专注 Whisper 离线识别，3 个核心文件，<0.1秒启动
 
 ## ✨ 特点
 
 - 🚀 **完全离线**：基于 Whisper 本地识别，无需联网
-- ⚡ **极速启动**：守护进程模式，<0.5秒响应
-- 📊 **实时反馈**：音量条、静音倒计时、苹果风格UI
+- ⚡ **快速启动**：守护进程模式，<0.1秒响应
+- 📊 **实时反馈**：音量条、静音倒计时、图形界面
 - 📋 **快速复制**：识别完成自动复制到剪贴板，Ctrl+V 粘贴
 - 🎯 **开箱即用**：一键安装脚本，5分钟配置完成
 - 🔒 **隐私保护**：完全本地识别，数据不上传
@@ -131,14 +134,19 @@ cd /path/to/voice_input
 1. 打开系统设置 → 键盘 → 快捷键 → 自定义快捷键
 2. 添加新快捷键：
    - **名称**: 语音输入
-   - **命令**: `/path/to/voice_input/voice_input.py --trigger`
+   - **命令**: `/path/to/voice_input/trigger.py`（守护进程模式）或 `/path/to/voice_input/voice_input.py`（普通模式）
    - **快捷键**: `Super+V`
 
 **i3/sway**：
 ```bash
 # 编辑 ~/.config/i3/config 或 ~/.config/sway/config
-bindsym $mod+v exec /path/to/voice_input/voice_input.py --trigger
+# 守护进程模式（推荐）
+bindsym $mod+v exec /path/to/voice_input/trigger.py
+# 或普通模式
+bindsym $mod+v exec /path/to/voice_input/voice_input.py
 ```
+
+**注意**：`trigger.py` 只在启用守护进程模式后才会生成
 
 ---
 
@@ -161,12 +169,15 @@ cd /path/to/voice_input
 # 普通模式（4-5秒启动）
 ./voice_input.py
 
-# 启动守护进程（后台常驻）
-./voice_input.py --daemon
+# 守护进程模式（推荐）
+# 1. 启动守护进程服务（后台常驻）
+systemctl --user start voice-input-daemon
 
-# 触发守护进程（<0.5秒启动）
-./voice_input.py --trigger
+# 2. 触发识别（<0.1秒启动）
+./trigger.py
 ```
+
+**注意**：首次使用守护进程需要运行 `./setup.sh install` 并选择启用守护进程
 
 ---
 
@@ -184,10 +195,10 @@ cd /path/to/voice_input
 
 #### 2. 守护进程模式（推荐）⭐
 - **启动方式**：后台常驻，预加载模型
-- **启动速度**：**<0.5 秒** 🚀
+- **启动速度**：**<0.1 秒** 🚀
 - **内存占用**：~900MB 常驻
 - **适合场景**：频繁使用（日均 10+ 次）
-- **额外功能**：实时音量条、静音倒计时
+- **额外功能**：轻量级触发器（trigger.py）、实时音量条、静音倒计时
 
 ### 守护进程管理
 
@@ -227,9 +238,11 @@ systemctl --user disable voice-input-daemon
 - 启动时一次性加载模型到内存
 - 后续使用直接复用已加载的模型
 - 通过 Unix Socket 通信，几乎无延迟
+- **动态生成轻量级触发器**：`trigger.py` 仅导入轻量库（socket、json、tkinter），避免加载重型库（whisper、numpy、pyaudio）
 
 **资源占用优化：**
-- 使用 `select()` 等待连接，空闲时 CPU <2%
+- 触发器启动时间：<0.1 秒（仅导入轻量库）
+- 守护进程使用 `select()` 等待连接，空闲时 CPU <2%
 - 内存占用稳定在 ~900MB
 - 无任务时不消耗 CPU 资源
 
@@ -239,7 +252,7 @@ systemctl --user disable voice-input-daemon
 
 ### Whisper 模型选择
 
-编辑 `voice_input.py` 第 43 行：
+编辑 `voice_input.py` 第 100 行：
 
 ```python
 WHISPER_MODEL = "base"  # 修改这里
@@ -249,7 +262,7 @@ WHISPER_MODEL = "base"  # 修改这里
 
 | 模型 | 内存占用 | 识别速度 | 准确率 | 说明 |
 |------|---------|---------|--------|------|
-| tiny | ~390MB | ⭐⭐⭐⭐⭐ 最快 | ⭐⭐⭐ 80% | 低配机器 |
+| tiny | ~390MB | ⭐⭐⭐⭐⭐ 很快 | ⭐⭐⭐ 80% | 低配机器 |
 | base | ~580MB | ⭐⭐⭐⭐ 快 | ⭐⭐⭐⭐ 85% | 推荐日常使用 |
 | small | ~1.2GB | ⭐⭐⭐ 中等 | ⭐⭐⭐⭐ 90% | 高准确率 |
 | medium | ~3.1GB | ⭐⭐ 较慢 | ⭐⭐⭐⭐⭐ 95% | 专业使用 |
@@ -261,7 +274,7 @@ WHISPER_MODEL = "base"  # 修改这里
 
 ### 静音检测时间
 
-编辑 `voice_input.py` 第 48 行：
+编辑 `voice_input.py` 第 108 行：
 
 ```python
 SILENCE_DURATION = 2.0  # 修改停顿时长（秒）
@@ -305,7 +318,7 @@ aplay test.wav  # 播放测试
 **方案 1：使用守护进程模式**（推荐）
 ```bash
 systemctl --user start voice-input-daemon
-# 按 Super+V 启动速度 <0.5秒
+# 按 Super+V 启动速度 <0.1秒
 ```
 
 **方案 2：降级模型**
@@ -342,8 +355,11 @@ ls -l /tmp/voice_input_daemon.sock
 
 **手动启动测试**：
 ```bash
-cd /path/to/voice_input
-./voice_input.py --daemon
+# 通过 systemd 启动
+systemctl --user restart voice-input-daemon
+
+# 查看是否生成了 trigger.py
+ls -l /path/to/voice_input/trigger.py
 ```
 
 ### 5. Tkinter 图形界面不可用
@@ -392,16 +408,17 @@ voice_input/
 ├── voice_input.py      # 主程序（包含所有功能）
 ├── README.md           # 本文档（包含所有说明）
 ├── setup.sh            # 安装/卸载脚本
-├── requirements.txt    # Python 依赖列表
 ├── LICENSE             # MIT 许可证
-└── venv/               # Python 虚拟环境（安装后自动创建）
+├── venv/               # Python 虚拟环境（安装后自动创建）
+└── trigger.py          # 轻量级触发器（启用守护进程时动态生成）
 ```
 
 **极简设计理念**：
-- ✅ 只有 3 个核心文件
+- ✅ 只有 3 个核心文件（voice_input.py、README.md、setup.sh）
 - ✅ 无需安装到系统目录
 - ✅ 项目可放在任意位置
 - ✅ 易于管理和备份
+- ✅ trigger.py 仅在启用守护进程时自动生成，保持项目简洁
 
 ---
 
@@ -438,7 +455,7 @@ gsettings reset org.gnome.settings-daemon.plugins.media-keys custom-keybindings
 
 ### 架构特点
 - **守护进程**: Unix Socket + systemd 服务
-- **UI 设计**: 苹果风格，支持 GUI/终端双模式
+- **UI 设计**: 支持 GUI/终端双模式
 - **性能优化**: 模型预加载 + select() 空闲优化
 
 ---
@@ -503,8 +520,8 @@ gsettings reset org.gnome.settings-daemon.plugins.media-keys custom-keybindings
 基于 **Whisper 完全离线识别**：
 
 - ✅ **隐私保护** - 完全本地，数据不上传
-- ✅ **极速启动** - <0.5秒启动（守护进程）
-- ✅ **实时反馈** - 音量条、倒计时、苹果风格UI
+- ✅ **快速启动** - <0.1秒启动（守护进程）
+- ✅ **实时反馈** - 音量条、倒计时、图形界面
 - ✅ **开箱即用** - 一键安装，5分钟配置
 - ✅ **极简设计** - 只需 3 个文件
 
@@ -513,6 +530,38 @@ gsettings reset org.gnome.settings-daemon.plugins.media-keys custom-keybindings
 ./setup.sh install              # 一键安装
 # 按 Super+V 开始使用
 ```
+
+---
+
+## 📌 版本说明
+
+**当前版本：v3.0.0** （2025-12-26）
+
+### v3.0.0 主要变化
+相比 v1.1 版本，v3.0 进行了**极简化重构**：
+
+**精简内容**：
+- ❌ 移除讯飞云在线识别方案（保留离线方案）
+- ❌ 删除 bin/、docs/、config/ 等多层目录结构
+- ❌ 合并 18+ 个文件为 3 个核心文件
+- ✅ 项目文件减少 64%，更易维护
+
+**保留功能**：
+- ✅ Whisper 离线识别（完全本地，隐私保护）
+- ✅ 守护进程模式（<0.1秒快速启动）
+- ✅ 图形界面（音量条、实时反馈）
+- ✅ 一键安装脚本
+
+**新增优化**：
+- 🚀 动态生成轻量级触发器（trigger.py）
+- 🚀 自动依赖检查和虚拟环境切换
+- 🚀 优化 UI 布局和用户体验
+- 📦 单文件设计，所有功能集成到 voice_input.py
+
+**设计理念**：
+- 专注离线方案，做到极致
+- 简化项目结构，降低维护成本
+- 后续计划在新分支重新开发双方案版本
 
 ---
 

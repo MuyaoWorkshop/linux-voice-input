@@ -126,7 +126,7 @@ COLOR_TEXT_SECONDARY = '#86868b'
 COLOR_SUCCESS = '#34c759'
 COLOR_ERROR = '#ff3b30'
 COLOR_PROGRESS_BG = '#e5e5e7'
-VOLUME_BAR_LENGTH = 500
+VOLUME_BAR_LENGTH = 420
 VOLUME_BAR_THICKNESS = 18
 AUTO_CLOSE_DELAY = 1000  # 窗口自动关闭延迟（毫秒）
 
@@ -504,7 +504,7 @@ class VoiceInputNormal:
                                       stdin=subprocess.PIPE)
             process.communicate(input=text.encode('utf-8'))
             print("\n✓ 已复制到剪贴板，可使用 Ctrl+V 粘贴")
-            self.ui.show_result(f"{text}\n\n已复制到剪贴板", success=True)
+            self.ui.show_result("✓ 已复制到剪贴板", success=True)
             return True
         except FileNotFoundError:
             error_msg = "未找到 xclip 命令\n请安装: sudo apt install xclip"
