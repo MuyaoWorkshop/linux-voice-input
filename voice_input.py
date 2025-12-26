@@ -10,13 +10,68 @@
 快捷键建议: Super+V
 """
 
+import os
+import sys
+import subprocess
+
+# 自动使用虚拟环境（如果存在）
+def use_venv_if_exists():
+    """如果项目目录有 venv/，自动使用 venv 里的 Python 重新执行"""
+    # 检测是否已经在虚拟环境中
+    if hasattr(sys, 'real_prefix') or (hasattr(sys, 'base_prefix') and sys.base_prefix != sys.prefix):
+        return  # 已经在虚拟环境中，直接返回
+
+    # 检查项目目录是否有 venv/
+    script_dir = os.path.dirname(os.path.abspath(__file__))
+    venv_python = os.path.join(script_dir, 'venv', 'bin', 'python3')
+
+    if os.path.exists(venv_python):
+        # 用 venv 的 Python 重新执行自己
+        os.execv(venv_python, [venv_python] + sys.argv)
+
+# 尝试使用虚拟环境
+use_venv_if_exists()
+
+# 检测是否在虚拟环境中运行
+def check_dependencies():
+    """检查依赖是否已安装，如果没有则给出友好提示"""
+    try:
+        import whisper
+        import pyaudio
+        import numpy as np
+        return True
+    except ImportError as e:
+        missing_module = str(e).split("'")[1] if "'" in str(e) else "unknown"
+
+        print("━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━")
+        print("  ⚠️  缺少依赖包")
+        print("━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━")
+        print(f"\n❌ 错误: 缺少 Python 模块 '{missing_module}'")
+        print("\n这个程序需要先安装依赖才能运行。")
+        print("\n请运行以下命令安装：")
+
+        # 获取项目目录
+        script_dir = os.path.dirname(os.path.abspath(__file__))
+        setup_script = os.path.join(script_dir, "setup.sh")
+
+        print(f"\n  cd {script_dir}")
+        print(f"  ./setup.sh install")
+        print("\n安装完成后，可以：")
+        print("  1. 按 Super+V 使用（如果配置了快捷键）")
+        print("  2. 或运行: ./voice_input.py --trigger")
+        print("\n提示: 安装过程会在项目目录创建虚拟环境（venv/）")
+        print("━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━")
+        return False
+
+# 运行依赖检查
+if not check_dependencies():
+    sys.exit(1)
+
+# 导入依赖（检查通过后）
 import whisper
 import pyaudio
 import wave
 import tempfile
-import os
-import subprocess
-import sys
 import time
 import numpy as np
 import socket
