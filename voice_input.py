@@ -305,7 +305,7 @@ class VoiceInputUI:
             bar_length = 30
             filled = int(volume / 100 * bar_length)
             bar = "▓" * filled + "░" * (bar_length - filled)
-            print(f"\r音量: {bar} {int(volume):3d}%", end="", flush=True)
+            print(f"\r音量: {bar} {int(volume):3d}%{' '*20}", end="", flush=True)
 
     def update_text(self, text):
         """更新识别文本"""
@@ -330,8 +330,8 @@ class VoiceInputUI:
                 pass
         else:
             # 终端模式：在同一行刷新状态
-            # 清除当前行并打印新状态，不换行
-            print(f"\r{status:<80}", end="", flush=True)
+            # 使用固定空格padding清除之前的内容（避免中文字符宽度计算问题）
+            print(f"\r{status}{' '*30}", end="", flush=True)
 
     def show_result(self, text, success=True):
         """显示最终结果"""
@@ -433,22 +433,26 @@ class VoiceInputNormal:
 
             # 更新 UI 音量显示
             volume_percent = min(100, (volume / 3000) * 100)
-            self.ui.update_volume(volume_percent)
 
             if volume > SILENCE_THRESHOLD:
                 if not started_speaking:
                     print("\n✓ 检测到声音，开始记录...")
-                    self.ui.show_status("🎤 正在录音... (检测到声音)")
                     started_speaking = True
                 silent_chunks = 0
-                # 只在 GUI 模式打点，终端模式通过 update_volume 显示
+                # 录音中，显示音量
+                self.ui.update_volume(volume_percent)
+                # 只在 GUI 模式打点
                 if self.ui.mode == "gui":
                     print(".", end="", flush=True)
             elif started_speaking:
                 silent_chunks += 1
                 remaining = max(0, SILENCE_DURATION - (silent_chunks * CHUNK / SAMPLE_RATE))
                 if remaining > 0:
+                    # 静音中，显示倒计时（不显示音量条，避免覆盖）
                     self.ui.show_status(f"🎤 录音中... (静音 {remaining:.1f}s 后结束)")
+            else:
+                # 未开始说话，显示音量
+                self.ui.update_volume(volume_percent)
 
             if started_speaking and silent_chunks > max_silent_chunks:
                 print(f"\n\n✓ 检测到 {SILENCE_DURATION} 秒静音，停止录音")

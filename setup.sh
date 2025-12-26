@@ -389,13 +389,13 @@ class VoiceInputUI:
             except: pass
         else:
             bar = "▓"*int(v/100*30) + "░"*(30-int(v/100*30))
-            print(f"\r音量: {bar} {int(v):3d}%", end="", flush=True)
+            print(f"\r音量: {bar} {int(v):3d}%{' '*20}", end="", flush=True)
 
     def show_status(self, s, c=None):
         if self.mode == "gui":
             try: self.status_label.config(text=s, fg=c or COLOR_TEXT_PRIMARY); self.root.update()
             except: pass
-        else: print(f"\n{s}")
+        # Terminal mode: output is handled by explicit print() statements in the trigger() function
 
     def show_result(self, text, success=True):
         if self.mode == "gui":
@@ -443,12 +443,12 @@ def trigger():
                     if st == 'recording_active' and ':' in msg:
                         v = int(msg.split(':')[1]); ui.update_volume(v)
                         bar = "█"*int(v/100*30) + "░"*(30-int(v/100*30))
-                        print(f"\r🎤 [{bar}] {v}%", end="", flush=True)
+                        print(f"\r🎤 [{bar}] {v}%{' '*20}", end="", flush=True)
                         recording_active = True
                     elif st == 'recording_silence' and ':' in msg:
                         r = msg.split(':')[1]
                         ui.show_status(f"🎤 录音中... (静音 {r}s 后结束)")
-                        print(f"\r⏸️  静音检测中... 还剩 {r} 秒", end="", flush=True)
+                        print(f"\r⏸️  静音检测中... 还剩 {r} 秒{' '*20}", end="", flush=True)
                     elif st == 'speaking':
                         if recording_active: print()
                         ui.show_status("🎤 正在录音... (检测到声音)"); print(msg); recording_active = True
