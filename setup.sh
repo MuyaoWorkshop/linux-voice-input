@@ -198,16 +198,39 @@ do_install() {
     # 4. 安装 Python 依赖
     print_header "安装 Python 依赖包"
     print_info "这可能需要几分钟时间..."
+    echo ""
 
     source "$PROJECT_DIR/venv/bin/activate"
+
+    print_info "正在升级 pip..."
     pip install --upgrade pip --quiet
+    echo ""
 
     if [ -f "$PROJECT_DIR/requirements.txt" ]; then
-        pip install -r "$PROJECT_DIR/requirements.txt" --quiet
+        print_info "正在安装依赖包（从 requirements.txt）..."
+        pip install -r "$PROJECT_DIR/requirements.txt"
     else
-        # 直接安装必需的包
-        pip install openai-whisper pyaudio numpy opencc-python-reimplemented --quiet
+        # 直接安装必需的包，显示每个包的安装进度
+        echo "正在安装以下依赖包："
+        echo "  1/4 openai-whisper (语音识别模型，约 140MB)"
+        echo "  2/4 pyaudio (音频录制库)"
+        echo "  3/4 numpy (数值计算库)"
+        echo "  4/4 opencc-python-reimplemented (繁简转换)"
+        echo ""
+
+        print_info "[1/4] 正在安装 openai-whisper..."
+        pip install openai-whisper
+
+        print_info "[2/4] 正在安装 pyaudio..."
+        pip install pyaudio
+
+        print_info "[3/4] 正在安装 numpy..."
+        pip install numpy
+
+        print_info "[4/4] 正在安装 opencc-python-reimplemented..."
+        pip install opencc-python-reimplemented
     fi
+    echo ""
 
     print_success "Python 依赖安装完成"
 
