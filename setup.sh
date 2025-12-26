@@ -61,6 +61,34 @@ detect_distro() {
     fi
 }
 
+# ========== 检测可用的终端模拟器 ==========
+detect_terminal() {
+    # 按优先级顺序检测
+    local terminals=(
+        "gnome-terminal"
+        "konsole"
+        "xfce4-terminal"
+        "mate-terminal"
+        "lxterminal"
+        "xterm"
+        "terminator"
+        "tilix"
+        "alacritty"
+        "kitty"
+    )
+
+    for term in "${terminals[@]}"; do
+        if command -v "$term" &> /dev/null; then
+            echo "$term"
+            return 0
+        fi
+    done
+
+    # 如果都没找到，返回空
+    echo ""
+    return 1
+}
+
 # ========== 安装功能 ==========
 do_install() {
     print_header "Voice Input 安装程序"
@@ -115,12 +143,23 @@ do_install() {
 
     # 可选依赖：python3-tk
     TK_AVAILABLE=false
+    TERMINAL_EMULATOR=""
     if python3 -c "import tkinter" 2>/dev/null; then
         TK_AVAILABLE=true
         print_success "Tkinter 可用 - 将使用图形界面"
     else
         print_warning "Tkinter 不可用 - 将使用终端模式"
         echo "         提示: 安装 python3-tk 可获得图形界面"
+
+        # 检测可用的终端模拟器
+        TERMINAL_EMULATOR=$(detect_terminal)
+        if [ -n "$TERMINAL_EMULATOR" ]; then
+            print_info "检测到终端模拟器: $TERMINAL_EMULATOR"
+            echo "         快捷键将在终端窗口中运行"
+        else
+            print_warning "未检测到常用终端模拟器"
+            echo "         建议安装: gnome-terminal, konsole, xfce4-terminal 或 xterm"
+        fi
     fi
 
     if [ ${#missing_deps[@]} -eq 0 ]; then
@@ -472,6 +511,32 @@ TRIGGER_EOF
     else
         SHORTCUT_CMD="$PROJECT_DIR/voice_input.py"
         SHORTCUT_DESC="语音输入 (普通模式)"
+    fi
+
+    # 如果没有 tkinter，需要在终端中运行
+    if [ "$TK_AVAILABLE" = false ] && [ -n "$TERMINAL_EMULATOR" ]; then
+        # 根据不同的终端模拟器使用不同的参数
+        case "$TERMINAL_EMULATOR" in
+            gnome-terminal)
+                SHORTCUT_CMD="$TERMINAL_EMULATOR -- $SHORTCUT_CMD"
+                ;;
+            konsole)
+                SHORTCUT_CMD="$TERMINAL_EMULATOR -e $SHORTCUT_CMD"
+                ;;
+            xfce4-terminal)
+                SHORTCUT_CMD="$TERMINAL_EMULATOR -e $SHORTCUT_CMD"
+                ;;
+            mate-terminal)
+                SHORTCUT_CMD="$TERMINAL_EMULATOR -e $SHORTCUT_CMD"
+                ;;
+            xterm|lxterminal|terminator|tilix)
+                SHORTCUT_CMD="$TERMINAL_EMULATOR -e $SHORTCUT_CMD"
+                ;;
+            alacritty|kitty)
+                SHORTCUT_CMD="$TERMINAL_EMULATOR -e $SHORTCUT_CMD"
+                ;;
+        esac
+        print_info "快捷键将在 $TERMINAL_EMULATOR 中运行"
     fi
 
     if [ "$DESKTOP" = "gnome" ]; then
