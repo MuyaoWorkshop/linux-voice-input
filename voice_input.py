@@ -807,9 +807,10 @@ def draw_volume_bar(volume_percent):
 
 def trigger_daemon():
     """触发守护进程执行录音"""
-    ui = VoiceInputUI(mode="auto", title="语音输入 (快速模式)", borderless=True)
-
+    # 先检查守护进程是否运行（快速失败）
     if not os.path.exists(SOCKET_PATH):
+        # 只有在错误时才创建 UI 显示错误
+        ui = VoiceInputUI(mode="auto", title="语音输入 (快速模式)", borderless=True)
         error_msg = "守护进程未运行\n请先运行: python voice_input.py --daemon"
         print(f"❌ {error_msg}")
         ui.show_error(error_msg)
@@ -818,16 +819,18 @@ def trigger_daemon():
         return False
 
     try:
-        # 连接到守护进程
-        ui.show_status("⏳ 连接守护进程...")
+        # 先连接到守护进程（很快，几毫秒）
         sock = socket.socket(socket.AF_UNIX, socket.SOCK_STREAM)
         sock.connect(SOCKET_PATH)
 
+        # 发送请求（立即发送，不等 UI）
+        sock.sendall(b"RECORD")
+
+        # 连接成功后再创建 UI（此时守护进程已经开始录音）
+        ui = VoiceInputUI(mode="auto", title="语音输入 (快速模式)", borderless=True)
+
         print("✓ 已连接到守护进程\n")
         ui.show_status("🎤 正在录音...")
-
-        # 发送请求
-        sock.sendall(b"RECORD")
 
         # 接收并显示状态更新
         buffer = ""
