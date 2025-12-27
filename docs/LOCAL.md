@@ -49,12 +49,11 @@
 
 ### 性能说明
 
-**本方案基于 CPU 运行**（无需 GPU），测试环境：
-- **机型**: ThinkPad T14, 16GB RAM
+**本方案基于 CPU 运行**（无需 GPU），典型性能：
 - **模型**: Whisper base
 - **首次加载**: ~3 秒
 - **识别 5 秒语音**: ~3-5 秒
-- **CPU 占用**: 50-70%
+- **CPU 占用**: 50-70%（4核CPU）
 
 ---
 
@@ -65,7 +64,7 @@
 项目提供了统一的安装脚本，支持自动配置：
 
 ```bash
-cd /home/wanps/bin/tools/voice_input
+cd <项目目录>
 ./install.sh
 ```
 
@@ -101,7 +100,7 @@ sudo apt install -y \
 #### 2. 创建虚拟环境
 
 ```bash
-cd /home/wanps/bin/tools/voice_input
+cd <项目目录>
 python3 -m venv venv
 source venv/bin/activate
 ```
@@ -158,7 +157,7 @@ name "语音输入"
 
 gsettings set org.gnome.settings-daemon.plugins.media-keys.custom-keybinding:\
 /org/gnome/settings-daemon/plugins/media-keys/custom-keybindings/voice-input/ \
-command "/home/wanps/bin/tools/voice_input/local/voice_input_wrapper.sh"
+command "<项目目录>/local/voice_input_wrapper.sh"
 
 gsettings set org.gnome.settings-daemon.plugins.media-keys.custom-keybinding:\
 /org/gnome/settings-daemon/plugins/media-keys/custom-keybindings/voice-input/ \
@@ -170,7 +169,7 @@ binding '<Super>v'
 - XFCE: 设置 → 键盘 → 应用程序快捷键
 - i3wm: 编辑 `~/.config/i3/config`，添加：
   ```
-  bindsym $mod+v exec /home/wanps/bin/tools/voice_input/local/voice_input_wrapper.sh
+  bindsym $mod+v exec <项目目录>/local/voice_input_wrapper.sh
   ```
 
 ---
@@ -180,7 +179,7 @@ binding '<Super>v'
 ### 命令行测试
 
 ```bash
-cd /home/wanps/bin/tools/voice_input
+cd <项目目录>
 source venv/bin/activate
 ./local/voice_input.py
 ```
@@ -241,7 +240,7 @@ source venv/bin/activate
 #### 方法二：手动切换
 
 ```bash
-cd /home/wanps/bin/tools/voice_input/local
+cd <项目目录>/local
 ./switch_mode.sh daemon
 ```
 
@@ -319,19 +318,6 @@ systemctl --user disable voice-input-daemon
 **工作状态：**
 - CPU：录音时 ~20-30%，识别时 ~150%（多核）
 - 内存：峰值 ~1GB
-
-### 技术原理
-
-想深入了解守护进程模式的实现原理？查看技术文档：
-
-👉 **[守护进程优化：从 4 秒到 0.5 秒](DAEMON_OPTIMIZATION.md)**
-
-**技术文档内容：**
-- 性能瓶颈分析（模型加载耗时 3.5 秒）
-- 解决方案设计（守护进程 vs 其他方案）
-- 架构设计（Unix Socket 通信）
-- 实现细节（Python + systemd）
-- 性能优化过程（CPU 占用 10% → 1.6%）
 
 ---
 
@@ -431,7 +417,7 @@ ModuleNotFoundError: No module named 'whisper'
 **解决方法**:
 ```bash
 # 激活虚拟环境
-cd /home/wanps/bin/tools/voice_input
+cd <项目目录>
 source venv/bin/activate
 
 # 重新安装依赖
@@ -444,13 +430,13 @@ pip install openai-whisper pyaudio
 
 1. 验证脚本可执行
    ```bash
-   ls -l /home/wanps/bin/tools/voice_input/local/voice_input_wrapper.sh
+   ls -l <项目目录>/local/voice_input_wrapper.sh
    # 应该有 x 权限
    ```
 
 2. 手动运行包装脚本
    ```bash
-   /home/wanps/bin/tools/voice_input/local/voice_input_wrapper.sh
+   <项目目录>/local/voice_input_wrapper.sh
    ```
 
 3. 检查快捷键配置
@@ -492,7 +478,7 @@ systemctl --user restart voice-input-daemon
 
 ### 性能测试数据
 
-测试环境：ThinkPad T14 (Intel i5, 16GB RAM)
+典型性能参考（4核Intel i5处理器）：
 
 | 语音长度 | tiny   | base   | small  |
 |----------|--------|--------|--------|
@@ -531,7 +517,7 @@ rm -f ~/.config/systemd/user/voice-input-daemon.service
 systemctl --user daemon-reload
 
 # 3. 删除虚拟环境和代码
-cd /home/wanps/bin/tools/voice_input
+cd <项目目录>
 rm -rf venv/
 rm -rf local/
 
@@ -583,4 +569,3 @@ result = model.transcribe("audio.wav", language="en")
 - **项目地址**: https://github.com/MuyaoWorkshop/linux-voice-input
 - **问题反馈**: https://github.com/MuyaoWorkshop/linux-voice-input/issues
 - **常见问题**: [FAQ.md](FAQ.md)
-- **技术文档**: [DAEMON_OPTIMIZATION.md](DAEMON_OPTIMIZATION.md)

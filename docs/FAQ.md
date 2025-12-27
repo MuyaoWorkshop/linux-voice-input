@@ -20,11 +20,8 @@
 
 **A**: 理论上支持所有主流Linux发行版。
 
-**已测试环境：**
-- ✅ Debian 12 + GNOME
-
 **其他发行版：**
-- Ubuntu/Arch/Fedora/openSUSE 等理论上可用，但未经测试
+- Ubuntu/Arch/Fedora/openSUSE/Debian 等主流发行版均可用
 - Fedora/CentOS 需手动调整包管理器命令（apt → dnf/yum）
 - openSUSE 需手动调整包管理器命令（apt → zypper）
 
@@ -61,11 +58,11 @@ python3 --version
 **A**:
 ```bash
 # 检查脚本权限
-ls -la ~/bin/tools/voice_input/*/*.sh
+ls -la <项目目录>/*/*.sh
 
 # 添加执行权限
-chmod +x ~/bin/tools/voice_input/*/*.sh
-chmod +x ~/bin/tools/voice_input/*/*.py
+chmod +x <项目目录>/*/*.sh
+chmod +x <项目目录>/*/*.py
 ```
 
 ### Q5: pip install 失败，提示网络错误
@@ -103,12 +100,12 @@ pip install --timeout=100 package-name
 **A**:
 ```bash
 # 激活项目虚拟环境
-cd ~/bin/tools/voice_input
+cd <项目目录>
 source venv/bin/activate
 
 # 检查是否在虚拟环境中
 which python
-# 应显示: ~/bin/tools/voice_input/venv/bin/python
+# 应显示: <项目目录>/venv/bin/python
 ```
 
 ### Q8: 快捷键不工作
@@ -124,7 +121,7 @@ which python
 
 2. **脚本是否有执行权限**
    ```bash
-   chmod +x ~/bin/tools/voice_input/*/*.sh
+   chmod +x <项目目录>/*/*.sh
    ```
 
 3. **是否在GNOME环境**
@@ -147,13 +144,13 @@ which python
 设置 → 快捷键 → 自定义快捷键 → 新建 → 全局快捷键 → 命令/URL
 名称: 语音输入（讯飞云）
 触发器: Meta+Shift+V
-动作: /home/用户名/bin/tools/voice_input/xfyun/voice_input_wrapper_xfyun.sh
+动作: <项目目录>/xfyun/voice_input_wrapper_xfyun.sh
 ```
 
 **XFCE:**
 ```
 设置 → 键盘 → 应用程序快捷键 → 添加
-命令: /home/用户名/bin/tools/voice_input/xfyun/voice_input_wrapper_xfyun.sh
+命令: <项目目录>/xfyun/voice_input_wrapper_xfyun.sh
 快捷键: Super+Shift+V
 ```
 
@@ -269,7 +266,7 @@ sudo apt install wl-clipboard
 1. **换用更小的模型**
    ```bash
    # 编辑脚本
-   nano ~/bin/tools/voice_input/local/voice_input.py
+   nano <项目目录>/local/voice_input.py
 
    # 修改这一行
    model = whisper.load_model("tiny")  # 改为 tiny
@@ -314,7 +311,7 @@ wget -O /dev/null http://speedtest.tele2.net/10MB.zip
 top
 
 # 降低优先级
-nice -n 10 ~/bin/tools/voice_input/local/voice_input.py
+nice -n 10 <项目目录>/local/voice_input.py
 ```
 
 **讯飞云方案：**
@@ -346,7 +343,7 @@ nice -n 10 ~/bin/tools/voice_input/local/voice_input.py
 **解决**:
 ```bash
 # 检查配置文件
-cat ~/bin/tools/voice_input/xfyun/config.ini
+cat <项目目录>/xfyun/config.ini
 
 # 确认：
 # 1. APPID、APISecret、APIKey 是否正确
@@ -354,7 +351,7 @@ cat ~/bin/tools/voice_input/xfyun/config.ini
 # 3. 没有引号
 
 # 重新配置
-cd ~/bin/tools/voice_input/xfyun
+cd <项目目录>/xfyun
 ./setup_xfyun.sh
 ```
 
@@ -398,7 +395,7 @@ cd ~/bin/tools/voice_input/xfyun
 如果仍有问题：
 ```bash
 # 更新代码
-cd ~/bin/tools/voice_input
+cd <项目目录>
 git pull
 
 # 重新测试
@@ -532,14 +529,14 @@ with open("result.txt", "w") as f:
 
 **A**:
 
-查看 [CHANGELOG.md](../CHANGELOG.md) 的"未来计划"部分。
-
-主要包括：
+未来计划包括：
 - 图形化界面
 - 更多桌面环境支持
 - 浏览器插件
 - 自动降级
 - 识别历史记录
+
+更多信息请关注 [GitHub Issues](https://github.com/MuyaoWorkshop/linux-voice-input/issues)
 
 ---
 

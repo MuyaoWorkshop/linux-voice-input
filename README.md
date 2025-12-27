@@ -8,9 +8,9 @@
 
 ## ✨ 特点
 
-- 🚀 **双方案支持**：默认安装离线 Whisper + 在线讯飞云，双快捷键随时切换
+- 🚀 **双方案支持**：离线 Whisper + 在线讯飞云，双快捷键随时切换
 - ⚡ **极速启动**：守护进程模式，<0.5秒响应（可选）
-- 📊 **实时反馈**：音量条、静音倒计时显示，两种模式体验一致
+- 📊 **实时反馈**：音量条、静音倒计时显示
 - 📋 **自动粘贴**：识别完成自动复制到剪贴板
 - 🎯 **开箱即用**：一键安装脚本，5分钟配置完成
 - 🔒 **隐私保护**：支持完全离线的本地识别
@@ -31,16 +31,6 @@
                 Ctrl+V 粘贴使用
 ```
 
-**典型场景：**
-- ✍️ 写文档、记笔记时懒得打字
-- 💬 聊天时快速输入长段文字
-- 📧 写邮件时边想边说
-- 🖥️ 任何需要文字输入的地方
-
-**效果对比：**
-- 传统打字 200 字：约 3-5 分钟
-- 语音输入 200 字：约 1 分钟 ⚡
-
 ## 📋 系统要求
 
 ### 最低配置
@@ -56,11 +46,6 @@
 - **CPU**：4 核心以上（离线识别更快）
 - **网络**：稳定网络连接（使用讯飞云方案时）
 
-### 已测试环境
-- ✅ Debian 12 + GNOME
-
-其他 Linux 发行版（Ubuntu/Arch/Fedora 等）理论上也可用，但未经测试。
-
 ---
 
 ## 🚀 快速安装（5分钟）
@@ -70,7 +55,7 @@
 项目默认安装双方案（本地 Whisper + 讯飞云），配置双快捷键：
 
 ```bash
-cd ~/bin/tools/voice_input
+cd <项目目录>
 ./install.sh
 ```
 
@@ -118,7 +103,7 @@ cd ~/bin/tools/voice_input
 
 1. **运行安装脚本**
    ```bash
-   cd ~/bin/tools/voice_input
+   cd <项目目录>
    ./install.sh
    ```
 
@@ -155,12 +140,6 @@ cd ~/bin/tools/voice_input
 - 隐私敏感内容
 - 作为云服务的备选方案
 
-**主要内容：**
-- 详细安装步骤
-- 守护进程模式配置
-- 性能优化技巧
-- 故障排查
-
 #### 讯飞云方案（在线）
 
 📁 **完整指南**: [docs/XFYUN.md](docs/XFYUN.md)
@@ -171,16 +150,9 @@ cd ~/bin/tools/voice_input
 - 对准确率要求高
 - 需要实时反馈
 
-**主要内容：**
-- 注册与配置步骤
-- API 密钥获取
-- 详细使用说明
-- 费用说明
-
 #### 其他文档
 
 - **[常见问题 FAQ](docs/FAQ.md)** - 故障排查、使用技巧
-- **[守护进程优化](docs/DAEMON_OPTIMIZATION.md)** - 技术深度解析
 
 ---
 
@@ -225,7 +197,7 @@ cd ~/bin/tools/voice_input
 
 #### 讯飞云（在线）
 
-1. 按 `Super + Shift + V`（如已配置双快捷键）
+1. 按 `Super + Shift + V`
 2. 对着麦克风连续说话（无时长限制）
 3. 按 `Ctrl + C` 停止
 4. 识别完成，自动复制
@@ -235,7 +207,7 @@ cd ~/bin/tools/voice_input
 
 ```bash
 # 本地 Whisper
-cd ~/bin/tools/voice_input
+cd <项目目录>
 source venv/bin/activate
 ./local/voice_input.py
 
@@ -255,19 +227,19 @@ source venv/bin/activate
 - **启动速度**：~10 秒
 - **内存占用**：0MB 常驻
 - **适合场景**：偶尔使用（日均 1-2 次）
-- **界面效果**：实时音量条、静音倒计时 ✨
+- **界面效果**：实时音量条、静音倒计时
 
 #### 2. 守护进程模式（推荐）⭐
 - **启动速度**：**<0.5 秒** 🚀
 - **内存占用**：~450MB 常驻
 - **适合场景**：频繁使用（日均 10+ 次）
-- **界面效果**：实时音量条、静音倒计时 ✨
+- **界面效果**：实时音量条、静音倒计时
 
 ### 一键切换模式
 
 ```bash
 # 查看当前模式
-cd ~/bin/tools/voice_input/local
+cd <项目目录>/local
 ./switch_mode.sh status
 
 # 切换到守护进程模式（快速）
@@ -280,43 +252,7 @@ cd ~/bin/tools/voice_input/local
 ./switch_mode.sh toggle
 ```
 
-详细说明见：[docs/LOCAL.md](docs/LOCAL.md) 或 [守护进程技术文档](docs/DAEMON_OPTIMIZATION.md)
-
----
-
-## 📖 实际使用示例
-
-### 场景1：写工作日报
-
-**传统方式：** 键盘打字 5 分钟，写 200 字
-**使用语音输入：** 说话 1 分钟 ⚡
-
-```
-操作步骤：
-1. 打开文本编辑器
-2. 按 Super+V 启动语音输入
-3. 说话："今天完成了用户登录模块的开发，修复了三个bug..."
-4. 停顿2秒或按Ctrl+C停止
-5. 按 Ctrl+V 粘贴到编辑器
-6. ✅ 完成！
-```
-
-### 场景2：回复长邮件
-
-**传统方式：** 打字 10 分钟
-**使用语音输入：** 说话 3 分钟 ⚡
-
-### 场景3：聊天输入长文本
-
-**微信/QQ/Telegram 等聊天工具都能用**
-
-```
-1. 在聊天窗口点击输入框
-2. 按 Super+V
-3. 说出你想发送的内容
-4. 停止后自动复制
-5. Ctrl+V 粘贴并发送
-```
+详细说明见：[docs/LOCAL.md](docs/LOCAL.md)
 
 ---
 
@@ -330,7 +266,7 @@ cd ~/bin/tools/voice_input/local
 | 🌐 讯飞连接失败 | API密钥错误/网络 | 检查 `xfyun/config.ini` 密钥 |
 | 🐌 识别很慢 | CPU性能不足 | 换用 tiny 模型或使用讯飞云 |
 | ❌ 无法粘贴 | xclip 未安装 | 运行 `sudo apt install xclip` |
-| ⌨️ 快捷键不工作 | 脚本权限/路径 | 运行 `chmod +x ~/bin/tools/voice_input/*/*.sh` |
+| ⌨️ 快捷键不工作 | 脚本权限/路径 | 运行 `chmod +x <项目目录>/*/*.sh` |
 
 详细故障排查请查看：
 - [常见问题 FAQ](docs/FAQ.md)
@@ -342,7 +278,7 @@ cd ~/bin/tools/voice_input/local
 ## 项目结构
 
 ```
-~/bin/tools/voice_input/
+voice-input/
 ├── README.md                    # 本文件（总览）
 ├── install.sh                   # 一键安装脚本 ⭐
 ├── uninstall.sh                 # 一键卸载脚本 ⭐
@@ -366,8 +302,7 @@ cd ~/bin/tools/voice_input/local
 └── docs/                        # 文档目录
     ├── LOCAL.md                 # 本地方案完整指南
     ├── XFYUN.md                 # 讯飞云方案完整指南
-    ├── FAQ.md                   # 常见问题
-    └── DAEMON_OPTIMIZATION.md   # 守护进程技术文档
+    └── FAQ.md                   # 常见问题
 ```
 
 ---
@@ -379,7 +314,7 @@ cd ~/bin/tools/voice_input/local
 项目提供了完整的卸载脚本：
 
 ```bash
-cd ~/bin/tools/voice_input
+cd <项目目录>
 ./uninstall.sh
 ```
 
@@ -390,33 +325,6 @@ cd ~/bin/tools/voice_input
 4. ✓ 清理符号链接
 5. ✓ 询问是否删除 Whisper 模型缓存（~140MB）
 6. ✓ 询问是否删除讯飞云配置
-
-### 手动卸载
-
-如果需要手动卸载：
-
-```bash
-# 1. 停止守护进程（如果启用）
-systemctl --user stop voice-input-daemon
-systemctl --user disable voice-input-daemon
-rm -f ~/.config/systemd/user/voice-input-daemon.service
-
-# 2. 删除快捷键配置
-# 方法1：使用卸载脚本
-./uninstall.sh
-
-# 方法2：手动删除
-# 设置 → 键盘 → 查看和自定义快捷键 → 删除相关项
-
-# 3. 删除项目文件
-rm -rf ~/bin/tools/voice_input
-
-# 4. （可选）删除 Whisper 模型缓存
-rm -rf ~/.cache/whisper
-
-# 5. （可选）卸载系统依赖
-sudo apt remove xclip portaudio19-dev
-```
 
 ---
 
@@ -437,7 +345,7 @@ sudo apt remove xclip portaudio19-dev
 ### 共同依赖
 - **Python 环境**: venv (项目虚拟环境)
 - **桌面环境**: GNOME (其他桌面需调整快捷键配置)
-- **系统**: Linux (Debian 12 已测试)
+- **系统**: Linux
 
 ---
 
@@ -455,23 +363,10 @@ MIT License
 
 ---
 
-## 总结
+## 快速上手
 
-这个项目提供了**灵活的混合方案**：
-
-1. **离线 Whisper** - 隐私保护，完全本地
-2. **讯飞云 API** - 实时准确，体验最佳
-
-**推荐配置：**
-- 运行 `./install.sh` 默认安装双方案
-- 选择守护进程模式（启动快）
-- 配置双快捷键，随时切换
-- 日常使用讯飞云（快速准确，自动标点）
-- 敏感内容用本地（隐私保护，完全离线）
-
-**快速上手：**
 ```bash
-cd ~/bin/tools/voice_input
+cd <项目目录>
 ./install.sh              # 安装
 ./local/switch_mode.sh    # 切换模式（可选）
 ./uninstall.sh            # 卸载（如需）

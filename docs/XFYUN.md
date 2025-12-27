@@ -52,7 +52,7 @@
 #### 1. 使用配置脚本（推荐）
 
 ```bash
-cd /home/wanps/bin/tools/voice_input
+cd <项目目录>
 ./install.sh
 ```
 
@@ -66,7 +66,7 @@ cd /home/wanps/bin/tools/voice_input
 如果已有基础环境：
 
 ```bash
-cd /home/wanps/bin/tools/voice_input/xfyun
+cd <项目目录>/xfyun
 ./setup_xfyun.sh
 ```
 
@@ -78,7 +78,7 @@ cd /home/wanps/bin/tools/voice_input/xfyun
 #### 3. 测试
 
 ```bash
-cd /home/wanps/bin/tools/voice_input/xfyun
+cd <项目目录>/xfyun
 ./voice_input_xfyun.py
 ```
 
@@ -158,7 +158,7 @@ APIKey:     xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx（32位字符）
 ### 使用统一安装脚本（推荐）
 
 ```bash
-cd /home/wanps/bin/tools/voice_input
+cd <项目目录>
 ./install.sh
 ```
 
@@ -171,7 +171,7 @@ cd /home/wanps/bin/tools/voice_input
 #### 1. 安装依赖
 
 ```bash
-cd /home/wanps/bin/tools/voice_input
+cd <项目目录>
 source venv/bin/activate
 pip install websocket-client pyaudio
 ```
@@ -188,7 +188,7 @@ cd xfyun
 **方法二：手动创建配置文件**
 
 ```bash
-cd /home/wanps/bin/tools/voice_input/xfyun
+cd <项目目录>/xfyun
 nano config.ini
 ```
 
@@ -237,7 +237,7 @@ name "Voice Input (讯飞云)"
 
 gsettings set org.gnome.settings-daemon.plugins.media-keys.custom-keybinding:\
 /org/gnome/settings-daemon/plugins/media-keys/custom-keybindings/custom-voice-cloud/ \
-command "/home/wanps/bin/tools/voice_input/xfyun/voice_input_wrapper_xfyun.sh"
+command "<项目目录>/xfyun/voice_input_wrapper_xfyun.sh"
 
 gsettings set org.gnome.settings-daemon.plugins.media-keys.custom-keybinding:\
 /org/gnome/settings-daemon/plugins/media-keys/custom-keybindings/custom-voice-cloud/ \
@@ -255,7 +255,7 @@ binding '<Shift><Super>v'
 ```bash
 gsettings set org.gnome.settings-daemon.plugins.media-keys.custom-keybinding:\
 /org/gnome/settings-daemon/plugins/media-keys/custom-keybindings/voice-input/ \
-command "/home/wanps/bin/tools/voice_input/xfyun/voice_input_wrapper_xfyun.sh"
+command "<项目目录>/xfyun/voice_input_wrapper_xfyun.sh"
 ```
 
 ---
@@ -265,7 +265,7 @@ command "/home/wanps/bin/tools/voice_input/xfyun/voice_input_wrapper_xfyun.sh"
 ### 命令行测试
 
 ```bash
-cd /home/wanps/bin/tools/voice_input/xfyun
+cd <项目目录>/xfyun
 source ../venv/bin/activate
 ./voice_input_xfyun.py
 ```
@@ -378,10 +378,10 @@ source ../venv/bin/activate
 
 ```bash
 # 检查配置文件
-cat /home/wanps/bin/tools/voice_input/xfyun/config.ini
+cat <项目目录>/xfyun/config.ini
 
 # 重新配置
-cd /home/wanps/bin/tools/voice_input/xfyun
+cd <项目目录>/xfyun
 ./setup_xfyun.sh
 ```
 
@@ -425,7 +425,7 @@ wget -O /dev/null http://speedtest.tele2.net/10MB.zip
 
 **解决：**
 ```bash
-cd /home/wanps/bin/tools/voice_input
+cd <项目目录>
 source venv/bin/activate
 pip install websocket-client
 ```
