@@ -143,7 +143,9 @@ if [ "$INSTALL_LOCAL" = true ]; then
     echo ""
     read -p "是否启用守护进程模式（快速启动）？[y/N] " -n 1 -r
     echo ""
+    DAEMON_ENABLED=false
     if [[ $REPLY =~ ^[Yy]$ ]]; then
+        DAEMON_ENABLED=true
         SERVICE_FILE="$HOME/.config/systemd/user/voice-input-daemon.service"
         mkdir -p "$HOME/.config/systemd/user"
 
@@ -200,7 +202,12 @@ if [[ $REPLY =~ ^[Yy]$ ]]; then
             *) WRAPPER_SCRIPT="$SCRIPT_DIR/local/voice_input_wrapper.sh" ;;
         esac
     elif [ "$INSTALL_LOCAL" = true ]; then
-        WRAPPER_SCRIPT="$SCRIPT_DIR/local/voice_input_wrapper.sh"
+        # 如果启用了守护进程，默认使用快速模式
+        if [ "$DAEMON_ENABLED" = true ]; then
+            WRAPPER_SCRIPT="$SCRIPT_DIR/local/voice_input_fast.sh"
+        else
+            WRAPPER_SCRIPT="$SCRIPT_DIR/local/voice_input_wrapper.sh"
+        fi
     else
         WRAPPER_SCRIPT="$SCRIPT_DIR/xfyun/voice_input_wrapper_xfyun.sh"
     fi
