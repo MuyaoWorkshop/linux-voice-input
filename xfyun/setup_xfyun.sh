@@ -8,17 +8,20 @@ echo "  讯飞语音识别 - 快速配置脚本"
 echo "========================================="
 echo ""
 
+# 获取项目根目录
+PROJECT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+
 # 检查虚拟环境
-if [ -z "$VIRTUAL_ENV" ] && [ ! -d "$HOME/.virtualenvs/voice_input" ]; then
+if [ -z "$VIRTUAL_ENV" ] && [ ! -d "$PROJECT_DIR/venv" ]; then
     echo "❌ 错误: 虚拟环境不存在"
-    echo "请先创建虚拟环境: mkvirtualenv voice_input"
+    echo "请先运行项目根目录的 install.sh 创建虚拟环境"
     exit 1
 fi
 
 # 激活虚拟环境
 if [ -z "$VIRTUAL_ENV" ]; then
     echo "激活虚拟环境..."
-    source ~/.virtualenvs/voice_input/bin/activate
+    source "$PROJECT_DIR/venv/bin/activate"
 fi
 
 # 安装依赖
