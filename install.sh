@@ -262,11 +262,12 @@ STEP=$((STEP + 1))
 echo -e "${STEP}. 查看详细文档:"
 echo -e "   总览: ${BLUE}README.md${NC}"
 if [ "$INSTALL_LOCAL" = true ]; then
-    echo -e "   本地方案: ${BLUE}local/QUICKSTART.md${NC}"
+    echo -e "   本地方案: ${BLUE}docs/LOCAL.md${NC}"
 fi
 if [ "$INSTALL_XFYUN" = true ]; then
-    echo -e "   讯飞云: ${BLUE}xfyun/XFYUN_QUICKSTART.md${NC}"
+    echo -e "   讯飞云方案: ${BLUE}docs/XFYUN.md${NC}"
 fi
+echo -e "   常见问题: ${BLUE}docs/FAQ.md${NC}"
 
 echo ""
 echo -e "${YELLOW}提示: 所有脚本都使用项目目录下的 venv/ 虚拟环境${NC}"

@@ -14,12 +14,12 @@
 - 📋 **自动粘贴**：识别完成自动复制到剪贴板
 - 🎯 **开箱即用**：提供完整安装脚本，5分钟配置完成
 - 🔒 **隐私保护**：支持完全离线的本地识别
-- 🔄 **一键切换**：守护进程模式 ↔ 普通模式，按需选择
+- 🔄 **一键切换**：双模式灵活选择，守护进程模式可选
 
 ## 🎬 使用演示
 
 ```
-按 Super+Shift+V → 🎤 说话 → ⏱️ 实时识别 → 📋 自动复制 → Ctrl+V 粘贴
+按 Super+V → 🎤 说话 → ⏱️ 实时识别 → 📋 自动复制 → Ctrl+V 粘贴
 ```
 
 **典型场景：**
@@ -38,7 +38,7 @@
 - **操作系统**：Linux（Debian/Ubuntu/Arch/Fedora 等桌面发行版）
 - **桌面环境**：GNOME（推荐）、KDE、XFCE 等
 - **Python 版本**：3.8 或更高
-- **磁盘空间**：2GB（Whisper 模型）
+- **磁盘空间**：1GB（Whisper 模型 + 依赖）
 - **内存**：4GB RAM
 - **麦克风**：任何 USB 或内置麦克风
 
@@ -48,47 +48,179 @@
 - **网络**：稳定网络连接（使用讯飞云方案时）
 
 ### 已测试环境
-- ✅ Debian 12
+- ✅ Debian 12 + GNOME
 
 其他 Linux 发行版（Ubuntu/Arch/Fedora 等）理论上也可用，但未经测试。
 
-## 🚀 5分钟快速开始
+---
 
-### 我该选择哪个方案？
+## 🚀 快速安装（5分钟）
 
-**回答3个问题快速决策：**
+### 一键安装
 
-1. **你有稳定的网络吗？**
-   - ✅ 有 → 推荐讯飞云（准确率 95%+、速度快）
-   - ❌ 没有 → 选择离线 Whisper
+项目提供了统一的安装脚本，自动完成所有配置：
 
-2. **你在意隐私吗？**
-   - ✅ 非常在意 → 离线 Whisper（完全本地）
-   - ⚪ 一般 → 讯飞云（体验更好）
-
-3. **你需要长文本输入吗？**
-   - ✅ 需要（>10秒） → 讯飞云（无时长限制）
-   - ❌ 不需要 → 离线 Whisper 足够
-
-### 开始安装（3选1）
-
-**方案 A：只装讯飞云（推荐新手）** ⭐
 ```bash
-cd ~/bin/tools/voice_input/xfyun
-./setup_xfyun.sh
-# 跟随提示注册账号、获取密钥、配置
+cd ~/bin/tools/voice_input
+./install.sh
 ```
-👉 [详细步骤](./xfyun/XFYUN_QUICKSTART.md)
 
-**方案 B：只装离线 Whisper**
+**安装脚本会自动完成：**
+1. ✓ 检查系统依赖（Python、xclip、portaudio 等）
+2. ✓ 创建项目虚拟环境（venv/）
+3. ✓ 安装 Python 依赖包
+4. ✓ 下载 Whisper 模型（如果未存在）
+5. ✓ 可选：配置守护进程服务
+6. ✓ 可选：配置 GNOME 快捷键
+
+### 安装选项
+
+**选项 1：仅安装本地 Whisper（离线方案）**
+- ✅ 完全离线，隐私保护
+- ✅ 无需 API 密钥
+- ⚠️ 识别速度较慢（3-5秒）
+- ⚠️ 无自动标点
+
+**选项 2：仅安装讯飞云（在线方案）**
+- ✅ 实时识别，速度快（<500ms）
+- ✅ 准确率高（95%+）
+- ✅ 自动添加标点
+- ⚠️ 需要网络连接
+- ⚠️ 需要注册讯飞账号（免费）
+
+**选项 3：安装双方案（推荐）** ⭐
+- ✅ 灵活切换，兼顾效率和隐私
+- ✅ 日常使用讯飞云（快速准确）
+- ✅ 敏感内容用本地（隐私保护）
+- ✅ 配置双快捷键，随时切换
+
+---
+
+## 📖 详细文档
+
+### 快速开始指南
+
+如果你是第一次使用，按照以下步骤：
+
+1. **运行安装脚本**
+   ```bash
+   cd ~/bin/tools/voice_input
+   ./install.sh
+   ```
+
+2. **选择安装方案**
+   - 推荐选择 `3) 安装双方案`
+   - 如果选择讯飞云，需要准备 API 密钥
+
+3. **获取讯飞 API 密钥**（如果选择讯飞云）
+   - 访问：https://www.xfyun.cn/ 注册账号
+   - 创建应用，开通"语音听写（流式版）"服务
+   - 获取 APPID、APISecret、APIKey
+   - 详细步骤见：[讯飞云方案文档](docs/XFYUN.md)
+
+4. **测试使用**
+   - 按 `Super + V` 测试
+   - 对着麦克风说话
+   - 结果自动复制到剪贴板
+
+### 方案文档
+
+#### 本地 Whisper 方案（离线）
+
+📁 **完整指南**: [docs/LOCAL.md](docs/LOCAL.md)
+
+**适合场景：**
+- 完全离线环境
+- 隐私敏感内容
+- 作为云服务的备选方案
+
+**主要内容：**
+- 详细安装步骤
+- 守护进程模式配置
+- 性能优化技巧
+- 故障排查
+
+#### 讯飞云方案（在线）
+
+📁 **完整指南**: [docs/XFYUN.md](docs/XFYUN.md)
+
+**适合场景：**
+- 日常办公、笔记输入
+- 长文本连续输入
+- 对准确率要求高
+- 需要实时反馈
+
+**主要内容：**
+- 注册与配置步骤
+- API 密钥获取
+- 详细使用说明
+- 费用说明
+
+#### 其他文档
+
+- **[常见问题 FAQ](docs/FAQ.md)** - 故障排查、使用技巧
+- **[守护进程优化](docs/DAEMON_OPTIMIZATION.md)** - 技术深度解析
+
+---
+
+## 方案对比
+
+### 📦 功能对比
+
+| 特性 | 离线 Whisper | 讯飞云 API |
+|------|-------------|------------|
+| **识别速度** | ⭐⭐ 延迟 3-5秒 | ⭐⭐⭐⭐⭐ 实时 <500ms |
+| **启动速度** | ⭐⭐⭐⭐⭐ <0.5秒（守护进程）<br>⭐⭐ 4-5秒（普通模式） | ⭐⭐⭐⭐⭐ 实时 |
+| **准确率** | ⭐⭐⭐⭐ 85% | ⭐⭐⭐⭐⭐ 95%+ |
+| **时长限制** | ⭐⭐⭐ 60秒 | ⭐⭐⭐⭐⭐ 无限制 |
+| **标点符号** | ❌ 无 | ✅ 自动添加 |
+| **网络需求** | ✅ 完全离线 | ⚠️ 需要联网 |
+| **隐私性** | ⭐⭐⭐⭐⭐ 本地处理 | ⭐⭐ 数据上传 |
+| **费用** | ✅ 完全免费 | ⭐⭐⭐⭐ 基本免费 |
+
+### 🎯 使用建议
+
+**推荐：混合使用（双方案）**
+- **日常使用** → 讯飞云（90%场景）- 快速、准确、长文本
+- **隐私保护** → 离线 Whisper（10%场景）- 敏感内容、离线环境
+
+**配置双快捷键：**
+- `Super + V` → 本地 Whisper
+- `Super + Shift + V` → 讯飞云（需手动配置）
+
+---
+
+## 使用方法
+
+### 快捷键（推荐）
+
+#### 本地 Whisper（离线）
+
+1. 按 `Super + V`
+2. 对着麦克风说话（60秒内）
+3. 停顿 2 秒自动结束
+4. 识别完成，自动复制
+5. 按 `Ctrl + V` 粘贴
+
+#### 讯飞云（在线）
+
+1. 按 `Super + Shift + V`（如已配置双快捷键）
+2. 对着麦克风连续说话（无时长限制）
+3. 按 `Ctrl + C` 停止
+4. 识别完成，自动复制
+5. 按 `Ctrl + V` 粘贴
+
+### 命令行
+
 ```bash
-# 查看完整安装指南
-cat ~/bin/tools/voice_input/local/INSTALL.md
-```
-👉 [详细步骤](./local/QUICKSTART.md)
+# 本地 Whisper
+cd ~/bin/tools/voice_input
+source venv/bin/activate
+./local/voice_input.py
 
-**方案 C：都装（最灵活）**
-先安装离线方案（基础环境），再添加讯飞云增强。
+# 讯飞云
+./xfyun/voice_input_xfyun.py
+```
 
 ---
 
@@ -99,13 +231,11 @@ cat ~/bin/tools/voice_input/local/INSTALL.md
 离线 Whisper 方案支持**两种运行模式**：
 
 #### 1. 普通模式（默认）
-- **启动方式**：按快捷键时加载模型
 - **启动速度**：4-5 秒
-- **内存占用**：不占用常驻内存
+- **内存占用**：0MB 常驻
 - **适合场景**：偶尔使用（日均 1-2 次）
 
 #### 2. 守护进程模式（推荐）⭐
-- **启动方式**：后台常驻，预加载模型
 - **启动速度**：**<0.5 秒** 🚀
 - **内存占用**：~900MB 常驻
 - **适合场景**：频繁使用（日均 10+ 次）
@@ -124,174 +254,11 @@ cd ~/bin/tools/voice_input/local
 # 切换到普通模式（节省内存）
 ./switch_mode.sh normal
 
-# 自动切换（守护进程 ↔ 普通）
+# 自动切换
 ./switch_mode.sh toggle
 ```
 
-### 守护进程管理命令
-
-```bash
-# 启动守护进程
-systemctl --user start voice-input-daemon
-
-# 停止守护进程
-systemctl --user stop voice-input-daemon
-
-# 开机自启动
-systemctl --user enable voice-input-daemon
-
-# 查看状态和资源占用
-systemctl --user status voice-input-daemon
-
-# 查看实时日志
-journalctl --user -u voice-input-daemon -f
-```
-
-### 技术文档
-
-想深入了解守护进程模式的实现原理？查看详细技术文档：
-
-👉 **[守护进程优化：从 4 秒到 0.5 秒](./docs/DAEMON_OPTIMIZATION.md)**
-
-**文档内容**：
-- 性能瓶颈分析
-- 解决方案设计与架构
-- Unix Socket 通信实现
-- systemd 服务配置
-- CPU 优化过程（10% → 1.6%）
-- 适合初学者的详细讲解
-
----
-
-## 方案选择
-
-### 📦 方案对比
-
-| 特性 | 离线 Whisper | 讯飞云 API |
-|------|-------------|------------|
-| **启动速度** | ⭐⭐⭐⭐⭐ <0.5秒（守护进程）<br>⭐⭐ 4-5秒（普通模式） | ⭐⭐⭐⭐⭐ 实时 <500ms |
-| **识别速度** | ⭐⭐⭐ 延迟 2-3秒 | ⭐⭐⭐⭐⭐ 实时 <500ms |
-| **准确率** | ⭐⭐⭐⭐ 85% | ⭐⭐⭐⭐⭐ 95%+ |
-| **时长限制** | ⭐⭐⭐ 60秒 | ⭐⭐⭐⭐⭐ 无限制 |
-| **实时反馈** | ✅ 音量条+倒计时（守护进程）<br>⚠️ 简单提示（普通模式） | ✅ 实时文字流 |
-| **标点符号** | ❌ 无 | ✅ 自动添加 |
-| **网络需求** | ✅ 完全离线 | ⚠️ 需要联网 |
-| **隐私性** | ⭐⭐⭐⭐⭐ 本地处理 | ⭐⭐ 数据上传 |
-| **内存占用** | ⭐⭐⭐ ~900MB（守护进程）<br>⭐⭐⭐⭐⭐ 0MB（普通模式） | ⭐⭐⭐⭐⭐ 极低 |
-| **费用** | ✅ 完全免费 | ⭐⭐⭐⭐ 基本免费 |
-
-### 🎯 使用建议
-
-**推荐：混合使用**
-- **日常使用** → 讯飞云（90%场景）- 快速、准确、长文本
-- **隐私保护** → 离线 Whisper（10%场景）- 敏感内容、离线环境
-
-**配置双快捷键：**
-- `Super + Shift + V` → 讯飞云
-- `Super + V` → 离线 Whisper
-
-## 📂 方案文档
-
-### 方案一：离线 Whisper（基础方案）
-
-📁 目录：`local/`
-
-- **[完整安装指南](./local/INSTALL.md)** - 详细安装步骤和故障排查
-- **[快速开始](./local/QUICKSTART.md)** - 5分钟快速部署
-
-**适合场景：**
-- 完全离线环境
-- 隐私敏感内容
-- 作为云服务的备选方案
-
-### 方案二：讯飞云 API（推荐方案）
-
-📁 目录：`xfyun/`
-
-- **[完整配置指南](./xfyun/XFYUN_GUIDE.md)** - API注册、密钥获取、详细配置
-- **[快速开始](./xfyun/XFYUN_QUICKSTART.md)** - 3分钟快速配置
-
-**适合场景：**
-- 日常办公、笔记输入
-- 长文本连续输入
-- 对准确率要求高
-- 需要实时反馈
-
----
-
-## 快速开始
-
-### 新用户（推荐流程）
-
-1. **先安装离线方案**（基础环境）
-   ```bash
-   # 查看详细步骤
-   cat ~/bin/tools/voice_input/local/INSTALL.md
-   ```
-
-2. **再配置讯飞云**（日常主力）
-   ```bash
-   cd ~/bin/tools/voice_input/xfyun
-   ./setup_xfyun.sh
-   ```
-
-3. **配置双快捷键**
-   - Super+V → 离线
-   - Super+Shift+V → 讯飞云
-
-### 已有离线方案用户
-
-直接添加讯飞云方案：
-```bash
-cd ~/bin/tools/voice_input/xfyun
-./setup_xfyun.sh
-```
-
----
-
-## 使用方法
-
-### 快捷键（推荐）
-
-**讯飞云（日常使用）：**
-1. 按 `Super + Shift + V`
-2. 对着麦克风连续说话（可以很长）
-3. 按 `Ctrl + C` 停止
-4. 自动复制到剪贴板
-5. 按 `Ctrl + V` 粘贴
-
-**离线 Whisper（隐私保护）：**
-1. 按 `Super + V`
-2. 对着麦克风说话（10秒内）
-3. 停顿 2 秒自动结束
-4. 自动复制到剪贴板
-5. 按 `Ctrl + V` 粘贴
-
-### 命令行
-
-```bash
-# 讯飞云
-cd ~/bin/tools/voice_input/xfyun
-./voice_input_xfyun.py
-
-# 离线 Whisper
-cd ~/bin/tools/voice_input/local
-./voice_input.py
-```
-
----
-
-## 工作流程对比
-
-### 讯飞云（实时流式）
-```
-Super+Shift+V → 弹出终端 → 🎤开始录音 → 持续说话 → 实时显示结果 → Ctrl+C停止 → ✓复制 → Ctrl+V粘贴
-```
-
-### 离线 Whisper（批量识别）
-```
-Super+V → 弹出终端 → 🎤录音 → 说话 → 停顿2秒 → 识别中... → ✓复制 → Ctrl+V粘贴
-```
+详细说明见：[docs/LOCAL.md](docs/LOCAL.md) 或 [守护进程技术文档](docs/DAEMON_OPTIMIZATION.md)
 
 ---
 
@@ -305,13 +272,11 @@ Super+V → 弹出终端 → 🎤录音 → 说话 → 停顿2秒 → 识别中.
 ```
 操作步骤：
 1. 打开文本编辑器
-2. 按 Super+Shift+V 启动语音输入
-3. 说话："今天完成了用户登录模块的开发，修复了三个bug，
-   包括密码验证逻辑错误、session超时处理和前端表单校验问题。
-   明天计划开始用户权限管理模块的设计。"
-4. 按 Ctrl+C 停止录音
+2. 按 Super+V 启动语音输入
+3. 说话："今天完成了用户登录模块的开发，修复了三个bug..."
+4. 停顿2秒或按Ctrl+C停止
 5. 按 Ctrl+V 粘贴到编辑器
-6. ✅ 完成！自动带标点符号
+6. ✅ 完成！
 ```
 
 ### 场景2：回复长邮件
@@ -319,187 +284,36 @@ Super+V → 弹出终端 → 🎤录音 → 说话 → 停顿2秒 → 识别中.
 **传统方式：** 打字 10 分钟
 **使用语音输入：** 说话 3 分钟 ⚡
 
-```
-特别适合：
-- 需要详细解释的技术邮件
-- 项目进度汇报
-- 客户需求沟通
-```
-
 ### 场景3：聊天输入长文本
 
 **微信/QQ/Telegram 等聊天工具都能用**
 
 ```
 1. 在聊天窗口点击输入框
-2. 按 Super+Shift+V
+2. 按 Super+V
 3. 说出你想发送的内容
-4. Ctrl+C 停止，Ctrl+V 粘贴
-5. 发送
-```
-
-### 场景4：写技术文档
-
-**边想边说，思路更流畅**
-
-```
-传统：想 → 组织语言 → 打字（思维中断）
-语音：想 → 直接说出来 → 粘贴（思维连贯）
-
-特别适合：
-- API 文档说明
-- 操作步骤记录
-- 设计思路整理
-```
-
-### 场景5：会议记录
-
-**实时记录会议要点**
-
-```
-会议中：
-- 按 Super+Shift+V
-- 听到重要内容时复述一遍
-- Ctrl+C 停止
-- Ctrl+V 粘贴到文档
-- 继续听会议
-
-比纯手打快 3-5 倍！
+4. 停止后自动复制
+5. Ctrl+V 粘贴并发送
 ```
 
 ---
 
-## 配置和优化
-
-详细的配置调整和使用技巧请查看各方案文档：
-
-### 离线 Whisper 配置
-- **模型选择** - tiny/base/small/medium
-- **语言设置** - 中文/英文/自动检测
-- **录音参数** - 时长、静音检测阈值
-- **性能优化** - CPU占用、内存管理
-
-📖 详见：[local/INSTALL.md](./local/INSTALL.md)
-
-### 讯飞云配置
-- **API 密钥管理** - 安全存储、权限设置
-- **网络优化** - 连接超时、重试策略
-- **识别参数** - 方言、领域定制
-- **费用管理** - 额度监控、成本优化
-
-📖 详见：[xfyun/XFYUN_GUIDE.md](./xfyun/XFYUN_GUIDE.md)
-
----
-
-## ⚠️ 常见问题与故障排查
+## ⚠️ 常见问题
 
 ### 快速排查表
 
-| 症状 | 可能原因 | 快速解决方案 | 详细文档 |
-|------|---------|------------|----------|
-| 🎤 录音失败/"无法打开麦克风" | 麦克风权限/驱动 | 运行 `arecord -l` 检查麦克风 | [麦克风问题](#麦克风问题) |
-| 🌐 讯飞连接失败 | API密钥错误/网络 | 检查 `xfyun/config.ini` 密钥 | [xfyun/XFYUN_GUIDE.md#Q1](./xfyun/XFYUN_GUIDE.md#常见问题) |
-| 🐌 离线识别很慢（>10秒） | CPU性能不足/模型太大 | 换用 tiny 模型：编辑脚本 `model="tiny"` | [local/INSTALL.md#性能优化](./local/INSTALL.md) |
-| ❌ 无法粘贴/剪贴板为空 | xclip 未安装 | 运行 `sudo apt install xclip` | [系统依赖](#系统依赖) |
-| ⌨️ 快捷键不工作 | 脚本权限/路径错误 | 运行 `chmod +x ~/bin/tools/voice_input/*/*.sh` | [local/INSTALL.md#配置快捷键](./local/INSTALL.md) |
-| 📝 识别结果无标点 | 使用了离线方案/讯飞服务未开通 | 切换到讯飞云方案 | [方案对比](#方案选择) |
-| 🔄 识别结果重复/乱码 | 网络问题/WebSocket异常 | 重启终端，重新运行脚本 | [xfyun/XFYUN_GUIDE.md](./xfyun/XFYUN_GUIDE.md) |
-| 💾 离线模型下载失败 | 网络问题/磁盘空间不足 | 检查磁盘空间 `df -h`，清理空间后重试 | [local/INSTALL.md](./local/INSTALL.md) |
-| 🚫 "ModuleNotFoundError" | Python包未安装/虚拟环境未激活 | 运行 `workon voice_input` 激活环境 | [环境配置](#环境配置) |
-| 🎯 识别准确率低 | 环境嘈杂/口音问题/模型不适合 | 在安静环境使用，或切换方案 | [提高准确率](#提高准确率) |
+| 症状 | 可能原因 | 快速解决方案 |
+|------|---------|------------|
+| 🎤 录音失败 | 麦克风权限/驱动 | 运行 `arecord -l` 检查麦克风 |
+| 🌐 讯飞连接失败 | API密钥错误/网络 | 检查 `xfyun/config.ini` 密钥 |
+| 🐌 识别很慢 | CPU性能不足 | 换用 tiny 模型或使用讯飞云 |
+| ❌ 无法粘贴 | xclip 未安装 | 运行 `sudo apt install xclip` |
+| ⌨️ 快捷键不工作 | 脚本权限/路径 | 运行 `chmod +x ~/bin/tools/voice_input/*/*.sh` |
 
-### 详细故障排查
-
-#### 麦克风问题
-
-**检查麦克风是否被识别：**
-```bash
-# 列出所有音频设备
-arecord -l
-
-# 测试录音（录5秒）
-arecord -d 5 test.wav
-
-# 播放测试
-aplay test.wav
-```
-
-**常见解决方案：**
-- Ubuntu/Debian: `sudo apt install alsa-utils pulseaudio`
-- 权限问题: `sudo usermod -aG audio $USER`（需要重新登录）
-
-#### 环境配置
-
-**检查虚拟环境：**
-```bash
-# 查看是否在虚拟环境中
-which python
-# 应显示：/home/用户名/.virtualenvs/voice_input/bin/python
-
-# 激活虚拟环境
-workon voice_input
-
-# 检查已安装的包
-pip list | grep -E "(whisper|torch|pyaudio|websocket)"
-```
-
-#### 系统依赖
-
-**安装缺失的依赖：**
-```bash
-# Debian/Ubuntu
-sudo apt update
-sudo apt install xclip portaudio19-dev python3-dev
-
-# Arch Linux
-sudo pacman -S xclip portaudio python
-```
-
-#### 提高准确率
-
-**离线方案：**
-- 升级模型：tiny → base → small → medium
-- 在安静环境使用
-- 说话清晰，速度适中
-
-**讯飞云方案：**
-- 检查网络连接稳定性
-- 在安静环境使用
-- 说话清晰，避免方言
-
-### 获取帮助
-
-如果以上方法都无法解决问题：
-
-1. 📖 查看详细文档：
-   - [离线方案完整指南](./local/INSTALL.md)
-   - [讯飞云完整指南](./xfyun/XFYUN_GUIDE.md)
-
-2. 🐛 提交问题：
-   - [GitHub Issues](https://github.com/MuyaoWorkshop/linux-voice-input/issues)
-   - [Gitee Issues](https://gitee.com/muyaoworkshop/linux-voice-input/issues)
-
-3. 📋 提交时请包含：
-   - 操作系统版本：`cat /etc/os-release`
-   - Python版本：`python3 --version`
-   - 错误信息截图或日志
-   - 复现步骤
-
-### 方案选择建议
-
-**何时用讯飞云？**
-- ✅ 日常办公、笔记
-- ✅ 长文本输入
-- ✅ 需要标点符号
-- ✅ 要求高准确率
-
-**何时用离线 Whisper？**
-- ✅ 隐私敏感内容
-- ✅ 离线环境
-- ✅ 短句输入
-- ✅ 不想依赖网络
-
-详细问题排查请查看各方案的文档。
+详细故障排查请查看：
+- [常见问题 FAQ](docs/FAQ.md)
+- [本地方案文档](docs/LOCAL.md)
+- [讯飞云方案文档](docs/XFYUN.md)
 
 ---
 
@@ -508,68 +322,30 @@ sudo pacman -S xclip portaudio python
 ```
 ~/bin/tools/voice_input/
 ├── README.md                    # 本文件（总览）
-├── .envrc                       # direnv 配置
+├── install.sh                   # 统一安装脚本 ⭐
+├── venv/                        # Python 虚拟环境
 │
 ├── local/                       # 离线 Whisper 方案
 │   ├── voice_input.py           # 主程序
 │   ├── voice_input_wrapper.sh   # 快捷键脚本
-│   ├── INSTALL.md               # 完整安装指南
-│   └── QUICKSTART.md            # 快速开始
+│   ├── voice_input_fast.sh      # 守护进程快捷键
+│   ├── voice_input_daemon.py    # 守护进程服务
+│   ├── voice_input_trigger.py   # 守护进程触发器
+│   └── switch_mode.sh           # 模式切换脚本
 │
-└── xfyun/                       # 讯飞云 API 方案
-    ├── voice_input_xfyun.py     # 主程序
-    ├── voice_input_wrapper_xfyun.sh  # 快捷键脚本
-    ├── setup_xfyun.sh           # 自动配置脚本
-    ├── config.ini.example       # 配置文件模板
-    ├── XFYUN_GUIDE.md           # 完整配置指南
-    └── XFYUN_QUICKSTART.md      # 快速开始
-
-~/.virtualenvs/voice_input/      # Python 虚拟环境（共享）
-├── bin/python
-└── lib/python3.x/site-packages/
-    ├── whisper/                 # Whisper 离线模型
-    ├── torch/                   # PyTorch
-    ├── pyaudio/                 # 音频录制
-    └── websocket/               # WebSocket 客户端
+├── xfyun/                       # 讯飞云 API 方案
+│   ├── voice_input_xfyun.py     # 主程序
+│   ├── voice_input_wrapper_xfyun.sh  # 快捷键脚本
+│   ├── setup_xfyun.sh           # 配置脚本
+│   ├── config.ini               # API 密钥配置
+│   └── config.ini.example       # 配置模板
+│
+└── docs/                        # 文档目录
+    ├── LOCAL.md                 # 本地方案完整指南
+    ├── XFYUN.md                 # 讯飞云方案完整指南
+    ├── FAQ.md                   # 常见问题
+    └── DAEMON_OPTIMIZATION.md   # 守护进程技术文档
 ```
-
-## 技术栈
-
-### 离线方案
-- **语音识别**: [OpenAI Whisper](https://github.com/openai/whisper)
-- **深度学习**: PyTorch (CPU mode)
-- **音频录制**: PyAudio
-- **系统集成**: xclip
-
-### 讯飞云方案
-- **语音识别**: [讯飞开放平台](https://www.xfyun.cn/)
-- **通信协议**: WebSocket
-- **音频录制**: PyAudio
-- **系统集成**: xclip
-
-### 共同依赖
-- **环境管理**: virtualenvwrapper + direnv
-- **桌面环境**: GNOME (其他桌面需调整快捷键配置)
-- **系统**: Linux (Debian/Ubuntu)
-
----
-
-## 📚 术语解释（新手可选阅读）
-
-如果你是Linux新手，可能对一些技术术语不熟悉。这里做简单解释：
-
-| 术语 | 解释 | 你需要知道的 |
-|------|------|------------|
-| **Whisper** | OpenAI 开发的离线语音识别AI模型 | 就像手机上的语音助手，但完全在你电脑上运行 |
-| **讯飞云** | 科大讯飞提供的在线语音识别服务 | 类似百度、搜狗的语音输入，需要联网 |
-| **virtualenv** | Python虚拟环境，隔离项目依赖 | 避免不同Python项目之间冲突，不用管细节 |
-| **xclip** | Linux剪贴板工具 | 让程序能把文字复制到剪贴板 |
-| **PyAudio** | Python录音库 | 让Python程序能录音 |
-| **WebSocket** | 实时双向通信协议 | 让你的电脑和讯飞服务器实时传输语音 |
-| **API密钥** | 访问讯飞服务的"钥匙" | 免费申请，证明你有权使用讯飞服务 |
-| **Super键** | Windows键 | 键盘上带Windows图标的键 |
-
-**总之：** 新手不需要深入理解这些，跟着安装步骤操作即可。
 
 ---
 
@@ -577,44 +353,69 @@ sudo pacman -S xclip portaudio python
 
 ### 完全卸载
 
-如果你决定不再使用这个工具，可以完全删除：
-
 ```bash
-# 1. 删除项目文件
+# 1. 停止守护进程（如果启用）
+systemctl --user stop voice-input-daemon
+systemctl --user disable voice-input-daemon
+
+# 2. 删除项目文件
 rm -rf ~/bin/tools/voice_input
 
-# 2. 删除 Python 虚拟环境
-rmvirtualenv voice_input
-
 # 3. 删除快捷键
-# 方法A：通过GNOME设置（推荐）
 # 设置 → 键盘 → 查看和自定义快捷键 → 删除"语音输入"相关项
 
-# 方法B：命令行删除
-gsettings set org.gnome.settings-daemon.plugins.media-keys custom-keybindings "[]"
-
 # 4. （可选）卸载系统依赖
-# 注意：这些工具可能被其他程序使用，请谨慎删除
 sudo apt remove xclip portaudio19-dev
-# 或 Arch: sudo pacman -R xclip portaudio
 ```
 
 ### 只卸载某个方案
 
 ```bash
-# 只删除讯飞云方案
-rm -rf ~/bin/tools/voice_input/xfyun
+cd ~/bin/tools/voice_input
 
-# 只删除离线方案（保留讯飞云）
-rm -rf ~/bin/tools/voice_input/local
+# 只删除讯飞云方案
+rm -rf xfyun/
+
+# 只删除离线方案
+rm -rf local/
+systemctl --user stop voice-input-daemon
+systemctl --user disable voice-input-daemon
 ```
 
-### 卸载后
+---
 
-- ✅ 不会影响系统其他功能
-- ✅ Python虚拟环境被删除，不占用磁盘
-- ✅ 快捷键失效
-- ✅ 如果想恢复，重新安装即可
+## 技术栈
+
+### 离线方案
+- **语音识别**: [OpenAI Whisper](https://github.com/openai/whisper)
+- **深度学习**: PyTorch (CPU mode)
+- **音频录制**: PyAudio
+- **系统集成**: xclip, gnome-terminal
+
+### 讯飞云方案
+- **语音识别**: [讯飞开放平台](https://www.xfyun.cn/)
+- **通信协议**: WebSocket
+- **音频录制**: PyAudio
+- **系统集成**: xclip, gnome-terminal
+
+### 共同依赖
+- **Python 环境**: venv (项目虚拟环境)
+- **桌面环境**: GNOME (其他桌面需调整快捷键配置)
+- **系统**: Linux (Debian 12 已测试)
+
+---
+
+## 贡献与支持
+
+- **项目地址**: https://github.com/MuyaoWorkshop/linux-voice-input
+- **问题反馈**: https://github.com/MuyaoWorkshop/linux-voice-input/issues
+- **文档更新**: 2025-12-27
+
+---
+
+## 许可证
+
+MIT License
 
 ---
 
@@ -625,22 +426,14 @@ rm -rf ~/bin/tools/voice_input/local
 1. **离线 Whisper** - 隐私保护，完全本地
 2. **讯飞云 API** - 实时准确，体验最佳
 
-推荐配置双快捷键，根据场景灵活切换，兼顾效率和隐私。
+**推荐配置：**
+- 使用 `./install.sh` 安装双方案
+- 配置双快捷键，根据场景灵活切换
+- 日常使用讯飞云（快速准确）
+- 敏感内容用本地（隐私保护）
 
-**快速开始：**
+**立即开始：**
 ```bash
-# 1. 安装离线方案（基础）
-cat ~/bin/tools/voice_input/local/QUICKSTART.md
-
-# 2. 配置讯飞云（增强）
-cd ~/bin/tools/voice_input/xfyun
-./setup_xfyun.sh
+cd ~/bin/tools/voice_input
+./install.sh
 ```
-
----
-
-## 支持与反馈
-
-- **项目地址**: https://github.com/MuyaoWorkshop/linux-voice-input
-- **问题反馈**: https://github.com/MuyaoWorkshop/linux-voice-input/issues
-- **文档更新**: 2025-12-22

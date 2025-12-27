@@ -98,22 +98,17 @@ pip install --timeout=100 package-name
 
 你不需要深入理解，跟着文档操作即可。
 
-### Q7: workon命令找不到
+### Q7: 虚拟环境未激活
 
 **A**:
 ```bash
-# 安装virtualenvwrapper
-pip install virtualenvwrapper
+# 激活项目虚拟环境
+cd ~/bin/tools/voice_input
+source venv/bin/activate
 
-# 添加到shell配置
-echo 'export WORKON_HOME=$HOME/.virtualenvs' >> ~/.bashrc
-echo 'source /usr/local/bin/virtualenvwrapper.sh' >> ~/.bashrc
-source ~/.bashrc
-
-# Zsh用户
-echo 'export WORKON_HOME=$HOME/.virtualenvs' >> ~/.zshrc
-echo 'source /usr/local/bin/virtualenvwrapper.sh' >> ~/.zshrc
-source ~/.zshrc
+# 检查是否在虚拟环境中
+which python
+# 应显示: ~/bin/tools/voice_input/venv/bin/python
 ```
 
 ### Q8: 快捷键不工作
@@ -340,7 +335,7 @@ nice -n 10 ~/bin/tools/voice_input/local/voice_input.py
 4. 开通"语音听写（流式版）"服务
 5. 获取 APPID、APISecret、APIKey
 
-详细步骤见：[xfyun/XFYUN_GUIDE.md](../xfyun/XFYUN_GUIDE.md)
+详细步骤见：[docs/XFYUN.md](XFYUN.md)
 
 ### Q18: 连接失败，错误代码10105
 
@@ -554,8 +549,8 @@ with open("result.txt", "w") as f:
 
 1. **查看详细文档**
    - [README.md](../README.md)
-   - [local/INSTALL.md](../local/INSTALL.md)
-   - [xfyun/XFYUN_GUIDE.md](../xfyun/XFYUN_GUIDE.md)
+   - [docs/LOCAL.md](LOCAL.md)
+   - [docs/XFYUN.md](XFYUN.md)
 
 2. **提交Issue**
    - [GitHub Issues](https://github.com/MuyaoWorkshop/linux-voice-input/issues)

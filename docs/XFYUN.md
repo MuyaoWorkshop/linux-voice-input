@@ -1,20 +1,28 @@
-# 讯飞语音识别 - 完整配置指南
+# 讯飞云方案 - 完整指南
 
-本指南将帮助你从零开始配置讯飞实时语音识别 API。
+基于讯飞开放平台的在线语音识别服务，实时准确，体验优秀。
 
 ## 目录
 
-- [方案优势](#方案优势)
-- [注册账号](#注册账号)
-- [创建应用获取密钥](#创建应用获取密钥)
-- [安装配置](#安装配置)
+- [方案特点](#方案特点)
+- [快速开始](#快速开始)
+- [注册与配置](#注册与配置)
+- [安装步骤](#安装步骤)
 - [使用方法](#使用方法)
 - [费用说明](#费用说明)
 - [常见问题](#常见问题)
 
 ---
 
-## 方案优势
+## 方案特点
+
+### 核心优势
+
+1. **实时流式识别** - 边说边出结果，无需等待
+2. **超高准确率** - 中文识别业内领先，准确率 95%+
+3. **智能标点** - 自动添加逗号、句号等标点符号
+4. **无时长限制** - 支持长文本连续输入
+5. **免费额度充足** - 个人使用完全够用
 
 ### 与离线方案对比
 
@@ -23,48 +31,75 @@
 | **识别速度** | ⭐⭐⭐⭐⭐ 实时（<500ms） | ⭐⭐ 延迟（3-5秒） |
 | **准确率** | ⭐⭐⭐⭐⭐ 95%+ | ⭐⭐⭐⭐ 85% |
 | **时长限制** | ⭐⭐⭐⭐⭐ 无限制 | ⭐⭐ 10秒 |
-| **标点符号** | ⭐⭐⭐⭐⭐ 自动添加 | ⭐⭐ 无标点 |
+| **标点符号** | ⭐⭐⭐⭐⭐ 自动添加 | ❌ 无标点 |
 | **流式识别** | ⭐⭐⭐⭐⭐ 边说边出 | ❌ 不支持 |
 | **网络需求** | ⚠️ 需要联网 | ✅ 完全离线 |
 | **隐私性** | ⚠️ 数据上传 | ✅ 本地处理 |
 | **费用** | ⭐⭐⭐⭐ 基本免费 | ⭐⭐⭐⭐⭐ 完全免费 |
 
-### 核心优势
+---
 
-1. **实时流式识别** - 边说边出结果，无需等待
-2. **超高准确率** - 中文识别业内领先
-3. **智能标点** - 自动添加逗号、句号等
-4. **无时长限制** - 支持长文本连续输入
-5. **免费额度充足** - 个人使用完全够用
+## 快速开始
+
+### 前提条件
+
+- 已完成基础环境配置（Python、系统依赖等）
+- 有网络连接
+- 准备注册讯飞账号
+
+### 3步快速配置
+
+#### 1. 使用配置脚本（推荐）
+
+```bash
+cd /home/wanps/bin/tools/voice_input
+./install.sh
+```
+
+安装时选择：
+- `2) 仅安装讯飞云` 或 `3) 安装双方案`
+- 按提示配置 API 密钥
+- 选择快捷键模式
+
+#### 2. 或使用 XFYun 配置脚本
+
+如果已有基础环境：
+
+```bash
+cd /home/wanps/bin/tools/voice_input/xfyun
+./setup_xfyun.sh
+```
+
+根据提示：
+- 安装依赖（websocket-client）
+- 输入 API 密钥（APPID、APISecret、APIKey）
+- 配置快捷键（双快捷键 / 单快捷键）
+
+#### 3. 测试
+
+```bash
+cd /home/wanps/bin/tools/voice_input/xfyun
+./voice_input_xfyun.py
+```
+
+对着麦克风说话，按 Ctrl+C 停止，应该看到实时识别结果。
 
 ---
 
-## 注册账号
+## 注册与配置
 
-### 1. 访问讯飞开放平台
+### 获取 API 密钥
 
-打开浏览器访问：**https://www.xfyun.cn/**
+#### 1. 注册账号
 
-### 2. 注册账号
+访问：**https://www.xfyun.cn/**
 
-点击右上角 **"注册"** 按钮：
-
-- 可以使用手机号注册
-- 或使用微信扫码登录
+- 点击右上角 **"注册"**
+- 使用手机号注册或微信扫码登录
 - 建议使用手机号注册（方便接收验证码）
 
-**填写信息：**
-```
-手机号：你的手机号
-验证码：点击获取并填写
-密码：设置一个密码
-```
-
-### 3. 实名认证（可选但建议）
-
-注册后建议完成实名认证：
-- 登录后点击右上角头像
-- 选择 "账号管理" → "实名认证"
+**可选但建议**完成实名认证：
+- 登录后点击右上角头像 → "账号管理" → "实名认证"
 - 填写姓名和身份证号
 - 上传身份证照片
 
@@ -73,30 +108,21 @@
 - 解锁更多功能
 - 获取更稳定的服务
 
----
+#### 2. 创建应用
 
-## 创建应用获取密钥
+登录后，进入控制台：https://console.xfyun.cn/
 
-### 1. 进入控制台
-
-登录后，点击右上角 **"控制台"**：
-https://console.xfyun.cn/
-
-### 2. 创建新应用
-
-1. 点击 **"创建新应用"** 按钮
+1. 点击 **"创建新应用"**
 2. 填写应用信息：
-
-```
-应用名称：语音输入工具
-应用类别：个人应用（或其他类别）
-应用平台：Linux
-应用描述：个人语音转文字输入工具
-```
-
+   ```
+   应用名称：语音输入工具
+   应用类别：个人应用
+   应用平台：Linux
+   应用描述：个人语音转文字输入工具
+   ```
 3. 点击 **"提交"** 创建应用
 
-### 3. 开通语音听写服务
+#### 3. 开通服务
 
 1. 在应用列表中找到刚创建的应用
 2. 点击应用名称进入详情页
@@ -108,7 +134,7 @@ https://console.xfyun.cn/
 - 选择 **"流式版"** 而不是普通版
 - 流式版支持实时识别，体验更好
 
-### 4. 获取 API 密钥
+#### 4. 获取密钥
 
 开通服务后，你会看到三个重要的密钥：
 
@@ -120,44 +146,50 @@ APIKey:     xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx（32位字符）
 
 **⚠️ 重要：请妥善保管这三个密钥，不要泄露！**
 
-可以点击 **"复制"** 按钮将它们保存到本地文件。
-
-### 5. 截图示例位置
-
 密钥位置：
 ```
 控制台 → 我的应用 → [你的应用名] → 语音听写（流式版） → 接口详情
 ```
 
-在该页面可以看到：
-- APPID
-- APISecret
-- APIKey
-- 接口调用量统计
-- 接口文档链接
-
 ---
 
-## 安装配置
+## 安装步骤
 
-### 1. 安装依赖
+### 使用统一安装脚本（推荐）
 
 ```bash
-# 进入虚拟环境
-cd ~/bin/tools/voice_input
-workon voice_input
-
-# 安装讯飞 WebSocket 客户端依赖
-pip install websocket-client
+cd /home/wanps/bin/tools/voice_input
+./install.sh
 ```
 
-### 2. 配置密钥
+选择方案时选 `2) 仅安装讯飞云` 或 `3) 安装双方案`。
 
-创建配置文件（密钥不会上传到代码仓库）：
+### 手动安装
+
+如果需要手动控制：
+
+#### 1. 安装依赖
 
 ```bash
-cd ~/bin/tools/voice_input
-nano config.ini  # 或使用其他编辑器
+cd /home/wanps/bin/tools/voice_input
+source venv/bin/activate
+pip install websocket-client pyaudio
+```
+
+#### 2. 配置密钥
+
+**方法一：使用配置脚本**
+
+```bash
+cd xfyun
+./setup_xfyun.sh
+```
+
+**方法二：手动创建配置文件**
+
+```bash
+cd /home/wanps/bin/tools/voice_input/xfyun
+nano config.ini
 ```
 
 填入以下内容（替换成你的真实密钥）：
@@ -172,72 +204,40 @@ APISecret = 你的APISecret
 APIKey = 你的APIKey
 ```
 
-保存文件并设置权限（仅自己可读）：
+保存文件并设置权限：
 
 ```bash
 chmod 600 config.ini
 ```
 
-### 3. 添加到 .gitignore
+#### 3. 配置快捷键
 
-如果使用 Git，避免密钥泄露：
+**方案 A：双快捷键模式（推荐）**
 
-```bash
-echo "config.ini" >> .gitignore
-```
-
-### 4. 下载讯飞脚本
-
-将 `voice_input_xfyun.py` 脚本放到项目目录：
+为讯飞版本配置不同的快捷键（`Super+Shift+V`）：
 
 ```bash
-cd ~/bin/tools/voice_input
-# 脚本文件已创建（见下文）
-chmod +x voice_input_xfyun.py
-```
+# 获取现有快捷键列表
+CURRENT=$(gsettings get org.gnome.settings-daemon.plugins.media-keys custom-keybindings)
 
-### 5. 创建快捷键包装脚本
+# 添加新的快捷键路径
+if [[ "$CURRENT" == "@as []" ]]; then
+    NEW_LIST="['/org/gnome/settings-daemon/plugins/media-keys/custom-keybindings/custom-voice-cloud/']"
+else
+    TEMP="${CURRENT%]}"
+    NEW_LIST="${TEMP}, '/org/gnome/settings-daemon/plugins/media-keys/custom-keybindings/custom-voice-cloud/']"
+fi
 
-创建或修改 `voice_input_wrapper_xfyun.sh`：
+gsettings set org.gnome.settings-daemon.plugins.media-keys custom-keybindings "$NEW_LIST"
 
-```bash
-#!/bin/bash
-# 讯飞语音输入包装脚本
-
-gnome-terminal --title="语音输入 (讯飞)" --geometry=80x20 -- bash -c "
-    source ~/.virtualenvs/voice_input/bin/activate
-    python3 ~/bin/tools/voice_input/voice_input_xfyun.py
-    echo ''
-    read -p '按回车关闭窗口...'
-"
-```
-
-设置权限：
-
-```bash
-chmod +x voice_input_wrapper_xfyun.sh
-```
-
-### 6. 配置快捷键
-
-#### 方案 A：新增快捷键（推荐）
-
-为讯飞版本配置不同的快捷键（如 `Super+Shift+V`）：
-
-```bash
-# 添加讯飞版本快捷键
-gsettings set org.gnome.settings-daemon.plugins.media-keys custom-keybindings \
-"['/org/gnome/settings-daemon/plugins/media-keys/custom-keybindings/custom-voice-local/', \
-'/org/gnome/settings-daemon/plugins/media-keys/custom-keybindings/custom-voice-cloud/']"
-
-# 配置讯飞版本（Super+Shift+V）
+# 配置讯飞云快捷键
 gsettings set org.gnome.settings-daemon.plugins.media-keys.custom-keybinding:\
 /org/gnome/settings-daemon/plugins/media-keys/custom-keybindings/custom-voice-cloud/ \
 name "Voice Input (讯飞云)"
 
 gsettings set org.gnome.settings-daemon.plugins.media-keys.custom-keybinding:\
 /org/gnome/settings-daemon/plugins/media-keys/custom-keybindings/custom-voice-cloud/ \
-command "/home/$USER/bin/tools/voice_input/voice_input_wrapper_xfyun.sh"
+command "/home/wanps/bin/tools/voice_input/xfyun/voice_input_wrapper_xfyun.sh"
 
 gsettings set org.gnome.settings-daemon.plugins.media-keys.custom-keybinding:\
 /org/gnome/settings-daemon/plugins/media-keys/custom-keybindings/custom-voice-cloud/ \
@@ -248,14 +248,14 @@ binding '<Shift><Super>v'
 - `Super + V` → 离线 Whisper（隐私保护）
 - `Super + Shift + V` → 讯飞云（快速准确）
 
-#### 方案 B：替换原快捷键
+**方案 B：单快捷键模式**
 
 直接将原来的快捷键改为讯飞版本：
 
 ```bash
 gsettings set org.gnome.settings-daemon.plugins.media-keys.custom-keybinding:\
-/org/gnome/settings-daemon/plugins/media-keys/custom-keybindings/custom-voice/ \
-command "/home/$USER/bin/tools/voice_input/voice_input_wrapper_xfyun.sh"
+/org/gnome/settings-daemon/plugins/media-keys/custom-keybindings/voice-input/ \
+command "/home/wanps/bin/tools/voice_input/xfyun/voice_input_wrapper_xfyun.sh"
 ```
 
 ---
@@ -265,7 +265,8 @@ command "/home/$USER/bin/tools/voice_input/voice_input_wrapper_xfyun.sh"
 ### 命令行测试
 
 ```bash
-cd ~/bin/tools/voice_input
+cd /home/wanps/bin/tools/voice_input/xfyun
+source ../venv/bin/activate
 ./voice_input_xfyun.py
 ```
 
@@ -292,6 +293,15 @@ cd ~/bin/tools/voice_input
 
 **方案 B (单快捷键)：**
 - 按 `Super + V` → 使用讯飞云识别
+
+### 使用步骤
+
+1. 按快捷键启动
+2. 对着麦克风连续说话（可以很长）
+3. 实时显示识别结果
+4. 按 `Ctrl + C` 停止
+5. 自动复制到剪贴板
+6. 按 `Ctrl + V` 粘贴到任何应用
 
 ### 使用技巧
 
@@ -362,16 +372,25 @@ cd ~/bin/tools/voice_input
 **原因：** APPID、APIKey 或 APISecret 错误
 
 **解决：**
-1. 检查 `config.ini` 中的密钥是否正确
+1. 检查 `xfyun/config.ini` 中的密钥是否正确
 2. 确认已开通 "语音听写（流式版）" 服务
 3. 重新复制粘贴密钥，避免多余空格
+
+```bash
+# 检查配置文件
+cat /home/wanps/bin/tools/voice_input/xfyun/config.ini
+
+# 重新配置
+cd /home/wanps/bin/tools/voice_input/xfyun
+./setup_xfyun.sh
+```
 
 ### Q2: 报错 "11200" 授权错误
 
 **原因：** IP 白名单限制
 
 **解决：**
-1. 登录控制台
+1. 登录讯飞控制台
 2. 进入应用 → IP白名单设置
 3. 添加 `0.0.0.0/0`（允许所有IP）或添加你的公网IP
 
@@ -387,23 +406,40 @@ cd ~/bin/tools/voice_input
 **原因：** 网络连接问题
 
 **解决：**
-1. 检查网络连接
-2. 尝试更换网络（4G/5G、WiFi）
-3. 使用国内网络（讯飞服务器在国内）
+```bash
+# 测试网络延迟
+ping api.xfyun.cn
 
-### Q5: 免费额度用完了
+# 测试下载速度
+wget -O /dev/null http://speedtest.tele2.net/10MB.zip
+```
 
-**查看用量：**
+**优化方案：**
+- 切换到更稳定的网络
+- 使用有线连接代替WiFi
+- 检查是否使用了VPN/代理
+
+### Q5: 提示"未找到 websocket"
+
+**原因：** 依赖未安装
+
+**解决：**
+```bash
+cd /home/wanps/bin/tools/voice_input
+source venv/bin/activate
+pip install websocket-client
+```
+
+### Q6: 免费额度够用吗？
+
+**A**: 个人用户每天 500 次，每次最长 60 秒，基本足够。
+
+**监控用量：**
 ```
 控制台 → 用量统计
 ```
 
-**解决：**
-1. 等待第二天重置（每天凌晨重置）
-2. 开通付费（费用极低）
-3. 降级使用离线 Whisper
-
-### Q6: 可以同时使用两个方案吗？
+### Q7: 可以同时使用两个方案吗？
 
 **可以！** 建议配置：
 - `Super + V` → 离线方案（隐私敏感）
@@ -411,37 +447,15 @@ cd ~/bin/tools/voice_input
 
 根据场景自由切换。
 
-### Q7: 网络断开怎么办？
-
-脚本会自动检测网络连接：
-- 如果连接失败，提示错误信息
-- 手动切换到离线方案
-
-未来可以实现自动降级。
-
 ### Q8: 识别结果不准确
 
 **优化方法：**
 1. 在安静环境使用
 2. 使用质量好的麦克风
 3. 说话清晰，速度适中
-4. 调整音频采样率（默认 16000Hz）
+4. 检查网络连接稳定性
 
-### Q9: 如何查看详细日志？
-
-编辑 `voice_input_xfyun.py`，启用调试模式：
-
-```python
-DEBUG = True  # 设置为 True
-```
-
-会显示：
-- WebSocket 连接日志
-- 音频发送日志
-- 识别结果详情
-- 错误堆栈信息
-
-### Q10: 支持方言吗？
+### Q9: 支持方言吗？
 
 讯飞支持多种方言，但需要在控制台开通对应服务：
 - 粤语
@@ -452,11 +466,15 @@ DEBUG = True  # 设置为 True
 
 默认使用普通话。
 
+### Q10: 网络断开怎么办？
+
+脚本会自动检测网络连接：
+- 如果连接失败，提示错误信息
+- 手动切换到离线方案
+
 ---
 
-## 对比总结
-
-### 何时使用讯飞云？
+## 何时使用讯飞云？
 
 ✅ 日常办公、笔记输入
 ✅ 需要长文本输入
@@ -464,14 +482,16 @@ DEBUG = True  # 设置为 True
 ✅ 需要实时反馈
 ✅ 网络环境良好
 
-### 何时使用离线 Whisper？
+## 何时使用离线 Whisper？
 
 ✅ 完全离线环境
 ✅ 隐私敏感内容
 ✅ 短句快速输入
 ✅ 不想依赖网络
 
-### 我的建议
+---
+
+## 我的建议
 
 **日常使用讯飞云作为主力，离线 Whisper 作为备选。**
 
@@ -481,16 +501,7 @@ DEBUG = True  # 设置为 True
 
 ---
 
-## 附录
-
-### 讯飞 API 官方文档
-
-- 控制台：https://console.xfyun.cn/
-- 流式语音听写文档：https://www.xfyun.cn/doc/asr/voicedictation/API.html
-- SDK 下载：https://www.xfyun.cn/sdk/
-- 技术支持：https://www.xfyun.cn/services/
-
-### 技术参数
+## 技术参数
 
 | 参数 | 默认值 | 说明 |
 |------|--------|------|
@@ -501,41 +512,12 @@ DEBUG = True  # 设置为 True
 | 语言 | zh_cn | 中文普通话 |
 | 标点 | 1（开启） | 自动添加标点 |
 
-### 项目文件结构
-
-```
-~/bin/tools/voice_input/
-├── README.md                      # 项目总览文档
-├── .envrc                         # direnv 配置
-│
-├── local/                         # 离线 Whisper 方案
-│   ├── voice_input.py             # 主程序
-│   ├── voice_input_wrapper.sh     # 快捷键脚本
-│   ├── INSTALL.md                 # 安装指南
-│   └── QUICKSTART.md              # 快速开始
-│
-└── xfyun/                         # 讯飞云 API 方案 ⭐
-    ├── voice_input_xfyun.py       # 主程序 ⭐
-    ├── voice_input_wrapper_xfyun.sh  # 快捷键脚本 ⭐
-    ├── setup_xfyun.sh             # 自动配置脚本 ⭐
-    ├── config.ini                 # API 密钥配置 ⭐
-    ├── config.ini.example         # 配置模板
-    ├── XFYUN_GUIDE.md             # 本文件 ⭐
-    └── XFYUN_QUICKSTART.md        # 快速开始 ⭐
-```
-
 ---
 
-**完成！** 现在你可以开始使用讯飞语音识别了。
+## 支持
 
-**下一步：** 参照本指南注册账号、获取密钥、安装配置，然后测试使用。
-
-有任何问题请参考 [常见问题](#常见问题) 章节。
-
----
-
-## 支持与反馈
-
+- **官方文档**: https://www.xfyun.cn/doc/asr/voicedictation/API.html
+- **控制台**: https://console.xfyun.cn/
 - **项目地址**: https://github.com/MuyaoWorkshop/linux-voice-input
 - **问题反馈**: https://github.com/MuyaoWorkshop/linux-voice-input/issues
-- **文档更新**: 2025-12-22
+- **常见问题**: [FAQ.md](FAQ.md)
