@@ -207,8 +207,24 @@ if [[ $REPLY =~ ^[Yy]$ ]]; then
 
     echo "配置快捷键为: Super+V"
 
-    # 配置 GNOME 快捷键
-    gsettings set org.gnome.settings-daemon.plugins.media-keys custom-keybindings "['/org/gnome/settings-daemon/plugins/media-keys/custom-keybindings/voice-input/']"
+    # 配置 GNOME 快捷键（不覆盖已有快捷键）
+    CURRENT=$(gsettings get org.gnome.settings-daemon.plugins.media-keys custom-keybindings)
+
+    # 检查是否已包含 voice-input
+    if ! echo "$CURRENT" | grep -q "voice-input"; then
+        # 添加到现有列表
+        if [[ "$CURRENT" == "@as []" ]]; then
+            # 当前为空，直接设置
+            NEW_LIST="['/org/gnome/settings-daemon/plugins/media-keys/custom-keybindings/voice-input/']"
+        else
+            # 追加到现有列表
+            TEMP="${CURRENT%]}"
+            NEW_LIST="${TEMP}, '/org/gnome/settings-daemon/plugins/media-keys/custom-keybindings/voice-input/']"
+        fi
+        gsettings set org.gnome.settings-daemon.plugins.media-keys custom-keybindings "$NEW_LIST"
+    fi
+
+    # 配置快捷键内容
     gsettings set org.gnome.settings-daemon.plugins.media-keys.custom-keybinding:/org/gnome/settings-daemon/plugins/media-keys/custom-keybindings/voice-input/ name '语音输入'
     gsettings set org.gnome.settings-daemon.plugins.media-keys.custom-keybinding:/org/gnome/settings-daemon/plugins/media-keys/custom-keybindings/voice-input/ command "$WRAPPER_SCRIPT"
     gsettings set org.gnome.settings-daemon.plugins.media-keys.custom-keybinding:/org/gnome/settings-daemon/plugins/media-keys/custom-keybindings/voice-input/ binding '<Super>v'
