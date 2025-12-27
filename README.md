@@ -8,18 +8,27 @@
 
 ## ✨ 特点
 
-- 🚀 **双方案可选**：离线 Whisper + 在线讯飞云，按需切换
+- 🚀 **双方案支持**：默认安装离线 Whisper + 在线讯飞云，双快捷键随时切换
 - ⚡ **极速启动**：守护进程模式，<0.5秒响应（可选）
-- 📊 **实时反馈**：音量条、静音倒计时，录音状态一目了然
+- 📊 **实时反馈**：音量条、静音倒计时显示，两种模式体验一致
 - 📋 **自动粘贴**：识别完成自动复制到剪贴板
-- 🎯 **开箱即用**：提供完整安装脚本，5分钟配置完成
+- 🎯 **开箱即用**：一键安装脚本，5分钟配置完成
 - 🔒 **隐私保护**：支持完全离线的本地识别
-- 🔄 **一键切换**：双模式灵活选择，守护进程模式可选
+- 🔄 **灵活切换**：本地方案支持守护进程/普通模式一键切换
 
 ## 🎬 使用演示
 
 ```
-按 Super+V → 🎤 说话 → ⏱️ 实时识别 → 📋 自动复制 → Ctrl+V 粘贴
+按 Super+V         → 🎤 本地识别（离线，隐私保护）
+按 Super+Shift+V   → 🎤 讯飞云识别（在线，高精度）
+                   ↓
+                🔊 实时音量条显示
+                   ↓
+                ⏸️ 静音倒计时
+                   ↓
+                📋 自动复制到剪贴板
+                   ↓
+                Ctrl+V 粘贴使用
 ```
 
 **典型场景：**
@@ -58,41 +67,46 @@
 
 ### 一键安装
 
-项目提供了统一的安装脚本，自动完成所有配置：
+项目默认安装双方案（本地 Whisper + 讯飞云），配置双快捷键：
 
 ```bash
 cd ~/bin/tools/voice_input
 ./install.sh
 ```
 
-**安装脚本会自动完成：**
+**安装流程：**
 1. ✓ 检查系统依赖（Python、xclip、portaudio 等）
 2. ✓ 创建项目虚拟环境（venv/）
-3. ✓ 安装 Python 依赖包
+3. ✓ 安装双方案 Python 依赖包
 4. ✓ 下载 Whisper 模型（如果未存在）
-5. ✓ 可选：配置守护进程服务
-6. ✓ 可选：配置 GNOME 快捷键
+5. ✓ 选择本地方案模式：
+   - **守护进程模式**（推荐）：启动快 <0.5秒，常驻内存 ~450MB
+   - **普通模式**：启动慢 ~10秒，按需加载
+6. ✓ 配置 GNOME 双快捷键：
+   - `Super+V` → 本地 Whisper（离线）
+   - `Super+Shift+V` → 讯飞云（在线）
 
-### 安装选项
+### 方案特点
 
-**选项 1：仅安装本地 Whisper（离线方案）**
+**本地 Whisper（离线）**
 - ✅ 完全离线，隐私保护
 - ✅ 无需 API 密钥
+- ✅ 实时音量条和倒计时显示
 - ⚠️ 识别速度较慢（3-5秒）
 - ⚠️ 无自动标点
 
-**选项 2：仅安装讯飞云（在线方案）**
+**讯飞云（在线）**
 - ✅ 实时识别，速度快（<500ms）
 - ✅ 准确率高（95%+）
 - ✅ 自动添加标点
+- ✅ 实时音量条显示
 - ⚠️ 需要网络连接
-- ⚠️ 需要注册讯飞账号（免费）
+- ⚠️ 需要配置 API 密钥（免费）
 
-**选项 3：安装双方案（推荐）** ⭐
-- ✅ 灵活切换，兼顾效率和隐私
-- ✅ 日常使用讯飞云（快速准确）
-- ✅ 敏感内容用本地（隐私保护）
-- ✅ 配置双快捷键，随时切换
+**使用建议** ⭐
+- 日常使用讯飞云（快速准确，自动标点）
+- 敏感内容用本地（隐私保护，完全离线）
+- 双快捷键随时切换，灵活方便
 
 ---
 
@@ -108,18 +122,25 @@ cd ~/bin/tools/voice_input
    ./install.sh
    ```
 
-2. **选择安装方案**
-   - 推荐选择 `3) 安装双方案`
-   - 如果选择讯飞云，需要准备 API 密钥
+2. **选择本地方案模式**
+   - 守护进程模式（推荐）：启动快，常驻内存
+   - 普通模式：按需加载，节省内存
 
-3. **获取讯飞 API 密钥**（如果选择讯飞云）
+3. **配置快捷键**
+   - 选择 `y` 自动配置 GNOME 快捷键
+   - `Super+V` → 本地方案
+   - `Super+Shift+V` → 讯飞云方案
+
+4. **配置讯飞云 API 密钥**（首次使用讯飞云时）
+   - 运行：`cd xfyun && ./setup_xfyun.sh`
    - 访问：https://www.xfyun.cn/ 注册账号
    - 创建应用，开通"语音听写（流式版）"服务
    - 获取 APPID、APISecret、APIKey
    - 详细步骤见：[讯飞云方案文档](docs/XFYUN.md)
 
-4. **测试使用**
-   - 按 `Super + V` 测试
+5. **测试使用**
+   - 按 `Super+V` 测试本地方案
+   - 按 `Super+Shift+V` 测试讯飞云方案
    - 对着麦克风说话
    - 结果自动复制到剪贴板
 
@@ -184,9 +205,9 @@ cd ~/bin/tools/voice_input
 - **日常使用** → 讯飞云（90%场景）- 快速、准确、长文本
 - **隐私保护** → 离线 Whisper（10%场景）- 敏感内容、离线环境
 
-**配置双快捷键：**
-- `Super + V` → 本地 Whisper
-- `Super + Shift + V` → 讯飞云（需手动配置）
+**配置双快捷键（自动配置）：**
+- `Super + V` → 本地 Whisper（离线）
+- `Super + Shift + V` → 讯飞云（在线）
 
 ---
 
@@ -230,16 +251,17 @@ source venv/bin/activate
 
 离线 Whisper 方案支持**两种运行模式**：
 
-#### 1. 普通模式（默认）
-- **启动速度**：4-5 秒
+#### 1. 普通模式
+- **启动速度**：~10 秒
 - **内存占用**：0MB 常驻
 - **适合场景**：偶尔使用（日均 1-2 次）
+- **界面效果**：实时音量条、静音倒计时 ✨
 
 #### 2. 守护进程模式（推荐）⭐
 - **启动速度**：**<0.5 秒** 🚀
-- **内存占用**：~900MB 常驻
+- **内存占用**：~450MB 常驻
 - **适合场景**：频繁使用（日均 10+ 次）
-- **额外功能**：实时音量条、静音倒计时
+- **界面效果**：实时音量条、静音倒计时 ✨
 
 ### 一键切换模式
 
@@ -322,23 +344,24 @@ cd ~/bin/tools/voice_input/local
 ```
 ~/bin/tools/voice_input/
 ├── README.md                    # 本文件（总览）
-├── install.sh                   # 统一安装脚本 ⭐
+├── install.sh                   # 一键安装脚本 ⭐
+├── uninstall.sh                 # 一键卸载脚本 ⭐
 ├── venv/                        # Python 虚拟环境
 │
 ├── local/                       # 离线 Whisper 方案
-│   ├── voice_input.py           # 主程序
-│   ├── voice_input_wrapper.sh   # 快捷键脚本
-│   ├── voice_input_fast.sh      # 守护进程快捷键
+│   ├── voice_input.py           # 主程序（普通模式）
+│   ├── voice_input_wrapper.sh   # 普通模式快捷键脚本
+│   ├── voice_input_fast.sh      # 守护进程模式快捷键脚本
 │   ├── voice_input_daemon.py    # 守护进程服务
 │   ├── voice_input_trigger.py   # 守护进程触发器
-│   └── switch_mode.sh           # 模式切换脚本
+│   └── switch_mode.sh           # 模式切换脚本 ⭐
 │
 ├── xfyun/                       # 讯飞云 API 方案
 │   ├── voice_input_xfyun.py     # 主程序
 │   ├── voice_input_wrapper_xfyun.sh  # 快捷键脚本
-│   ├── setup_xfyun.sh           # 配置脚本
-│   ├── config.ini               # API 密钥配置
-│   └── config.ini.example       # 配置模板
+│   ├── setup_xfyun.sh           # API 配置脚本 ⭐
+│   ├── config.json              # API 密钥配置
+│   └── config.json.example      # 配置模板
 │
 └── docs/                        # 文档目录
     ├── LOCAL.md                 # 本地方案完整指南
@@ -351,35 +374,48 @@ cd ~/bin/tools/voice_input/local
 
 ## 🗑️ 卸载方法
 
-### 完全卸载
+### 一键卸载
+
+项目提供了完整的卸载脚本：
+
+```bash
+cd ~/bin/tools/voice_input
+./uninstall.sh
+```
+
+**卸载脚本会自动：**
+1. ✓ 停止并删除守护进程
+2. ✓ 删除双快捷键配置
+3. ✓ 删除虚拟环境
+4. ✓ 清理符号链接
+5. ✓ 询问是否删除 Whisper 模型缓存（~140MB）
+6. ✓ 询问是否删除讯飞云配置
+
+### 手动卸载
+
+如果需要手动卸载：
 
 ```bash
 # 1. 停止守护进程（如果启用）
 systemctl --user stop voice-input-daemon
 systemctl --user disable voice-input-daemon
+rm -f ~/.config/systemd/user/voice-input-daemon.service
 
-# 2. 删除项目文件
+# 2. 删除快捷键配置
+# 方法1：使用卸载脚本
+./uninstall.sh
+
+# 方法2：手动删除
+# 设置 → 键盘 → 查看和自定义快捷键 → 删除相关项
+
+# 3. 删除项目文件
 rm -rf ~/bin/tools/voice_input
 
-# 3. 删除快捷键
-# 设置 → 键盘 → 查看和自定义快捷键 → 删除"语音输入"相关项
+# 4. （可选）删除 Whisper 模型缓存
+rm -rf ~/.cache/whisper
 
-# 4. （可选）卸载系统依赖
+# 5. （可选）卸载系统依赖
 sudo apt remove xclip portaudio19-dev
-```
-
-### 只卸载某个方案
-
-```bash
-cd ~/bin/tools/voice_input
-
-# 只删除讯飞云方案
-rm -rf xfyun/
-
-# 只删除离线方案
-rm -rf local/
-systemctl --user stop voice-input-daemon
-systemctl --user disable voice-input-daemon
 ```
 
 ---
@@ -427,13 +463,16 @@ MIT License
 2. **讯飞云 API** - 实时准确，体验最佳
 
 **推荐配置：**
-- 使用 `./install.sh` 安装双方案
-- 配置双快捷键，根据场景灵活切换
-- 日常使用讯飞云（快速准确）
-- 敏感内容用本地（隐私保护）
+- 运行 `./install.sh` 默认安装双方案
+- 选择守护进程模式（启动快）
+- 配置双快捷键，随时切换
+- 日常使用讯飞云（快速准确，自动标点）
+- 敏感内容用本地（隐私保护，完全离线）
 
-**立即开始：**
+**快速上手：**
 ```bash
 cd ~/bin/tools/voice_input
-./install.sh
+./install.sh              # 安装
+./local/switch_mode.sh    # 切换模式（可选）
+./uninstall.sh            # 卸载（如需）
 ```

@@ -45,6 +45,15 @@ class VoiceInput:
             self.cc = None
             print("繁简转换: 未启用 (可选安装: pip install opencc-python-reimplemented)")
 
+    def draw_volume_bar(self, volume, threshold):
+        """绘制音量条"""
+        # 将音量映射到 0-100%
+        volume_percent = min(100, int((volume / threshold) * 50))
+        bar_length = 30
+        filled = int(bar_length * volume_percent / 100)
+        bar = "█" * filled + "░" * (bar_length - filled)
+        return f"🎤 [{bar}] {volume_percent}%"
+
     def record_audio(self, filename):
         """录制音频，检测静音自动停止"""
         audio = pyaudio.PyAudio()
@@ -58,7 +67,7 @@ class VoiceInput:
             frames_per_buffer=CHUNK
         )
 
-        print(f"\n🎤 开始录音... (说话后停顿{SILENCE_DURATION}秒自动结束，最长{RECORD_SECONDS}秒)")
+        print(f"\n🎤 开始录音... (停顿{SILENCE_DURATION}秒自动结束，最长{RECORD_SECONDS}秒)")
 
         frames = []
         silent_chunks = 0
@@ -73,17 +82,20 @@ class VoiceInput:
             audio_data = np.frombuffer(data, dtype=np.int16)
             volume = np.abs(audio_data).mean()
 
-            # 调试输出（可选）：显示实时音量
-            # print(f"\r当前音量: {volume:.0f}", end="", flush=True)
-
             if volume > SILENCE_THRESHOLD:
                 if not started_speaking:
                     print("\n✓ 检测到声音，开始记录...")
                     started_speaking = True
                 silent_chunks = 0
-                print(".", end="", flush=True)
+                # 显示实时音量条
+                volume_bar = self.draw_volume_bar(volume, SILENCE_THRESHOLD)
+                print(f"\r{volume_bar}", end="", flush=True)
             elif started_speaking:
                 silent_chunks += 1
+                # 显示静音倒计时
+                remaining_time = (max_silent_chunks - silent_chunks) * CHUNK / SAMPLE_RATE
+                if remaining_time > 0:
+                    print(f"\r⏸️  静音检测中... 还剩 {remaining_time:.1f} 秒", end="", flush=True)
 
             # 如果已经开始说话，且静音超过阈值，停止录音
             if started_speaking and silent_chunks > max_silent_chunks:
