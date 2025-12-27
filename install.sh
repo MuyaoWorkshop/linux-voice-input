@@ -68,88 +68,59 @@ else
 fi
 echo ""
 
-# 3. 选择要安装的方案
-echo -e "${YELLOW}[3/7] 选择安装方案...${NC}"
-echo "1) 仅安装本地 Whisper（完全离线，隐私保护）"
-echo "2) 仅安装讯飞云（在线识别，高精度）"
-echo "3) 安装双方案（推荐，灵活切换）"
-echo ""
-read -p "请选择 [1-3，默认 3]: " CHOICE
-CHOICE=${CHOICE:-3}
-
-INSTALL_LOCAL=false
-INSTALL_XFYUN=false
-
-case $CHOICE in
-    1)
-        INSTALL_LOCAL=true
-        echo -e "${BLUE}将安装: 本地 Whisper${NC}"
-        ;;
-    2)
-        INSTALL_XFYUN=true
-        echo -e "${BLUE}将安装: 讯飞云${NC}"
-        ;;
-    3)
-        INSTALL_LOCAL=true
-        INSTALL_XFYUN=true
-        echo -e "${BLUE}将安装: 双方案${NC}"
-        ;;
-    *)
-        echo -e "${RED}无效选择${NC}"
-        exit 1
-        ;;
-esac
+# 3. 安装双方案
+echo -e "${YELLOW}[3/6] 安装方案...${NC}"
+echo -e "${BLUE}将安装双方案（本地 Whisper + 讯飞云）${NC}"
+echo "  - 本地方案: 完全离线，隐私保护"
+echo "  - 讯飞云: 在线识别，高精度"
 echo ""
 
 # 4. 安装 Python 依赖
-echo -e "${YELLOW}[4/7] 安装 Python 依赖...${NC}"
+echo -e "${YELLOW}[4/6] 安装 Python 依赖...${NC}"
 source venv/bin/activate
 
 # 升级 pip
 echo "升级 pip..."
 pip install -q --upgrade pip
 
-# 安装本地方案依赖
-if [ "$INSTALL_LOCAL" = true ]; then
-    echo "安装本地 Whisper 依赖..."
-    pip install -q openai-whisper pyaudio numpy
-    pip install -q opencc-python-reimplemented || echo -e "${YELLOW}  警告: OpenCC 安装失败（可选）${NC}"
-fi
+# 安装双方案依赖
+echo "安装本地 Whisper 依赖..."
+pip install -q openai-whisper pyaudio numpy
+pip install -q opencc-python-reimplemented || echo -e "${YELLOW}  警告: OpenCC 安装失败（可选）${NC}"
 
-# 安装讯飞云依赖
-if [ "$INSTALL_XFYUN" = true ]; then
-    echo "安装讯飞云依赖..."
-    pip install -q websocket-client pyaudio
-fi
+echo "安装讯飞云依赖..."
+pip install -q websocket-client
 
 echo -e "${GREEN}✓ Python 依赖安装完成${NC}\n"
 
 # 5. 下载模型和配置
-echo -e "${YELLOW}[5/7] 配置各方案...${NC}"
+echo -e "${YELLOW}[5/6] 下载模型和配置...${NC}"
 
-# 配置本地 Whisper
-if [ "$INSTALL_LOCAL" = true ]; then
-    # 检查模型是否已存在
-    MODEL_PATH="$HOME/.cache/whisper/base.pt"
-    if [ -f "$MODEL_PATH" ]; then
-        echo -e "${GREEN}✓ Whisper base 模型已存在，跳过下载${NC}"
-    else
-        echo "下载 Whisper base 模型（约 140MB）..."
-        python3 -c "import whisper; whisper.load_model('base')" 2>&1 | grep -v "FutureWarning" || true
-        echo -e "${GREEN}✓ Whisper 模型下载完成${NC}"
-    fi
+# 检查模型是否已存在
+MODEL_PATH="$HOME/.cache/whisper/base.pt"
+if [ -f "$MODEL_PATH" ]; then
+    echo -e "${GREEN}✓ Whisper base 模型已存在，跳过下载${NC}"
+else
+    echo "下载 Whisper base 模型（约 140MB）..."
+    python3 -c "import whisper; whisper.load_model('base')" 2>&1 | grep -v "FutureWarning" || true
+    echo -e "${GREEN}✓ Whisper 模型下载完成${NC}"
+fi
 
-    # 询问是否配置守护进程
-    echo ""
-    read -p "是否启用守护进程模式（快速启动）？[y/N] " -n 1 -r
-    echo ""
-    DAEMON_ENABLED=false
-    if [[ $REPLY =~ ^[Yy]$ ]]; then
-        DAEMON_ENABLED=true
-        SERVICE_FILE="$HOME/.config/systemd/user/voice-input-daemon.service"
-        mkdir -p "$HOME/.config/systemd/user"
+# 选择本地方案模式
+echo ""
+echo "本地方案模式选择："
+echo "1) 守护进程模式（启动快 <0.5秒，常驻内存 ~450MB）"
+echo "2) 普通模式（启动慢 ~10秒，按需加载）"
+read -p "请选择 [1-2，默认 1]: " MODE_CHOICE
+MODE_CHOICE=${MODE_CHOICE:-1}
 
-        cat > "$SERVICE_FILE" << EOF
+DAEMON_ENABLED=false
+if [ "$MODE_CHOICE" = "1" ]; then
+    DAEMON_ENABLED=true
+    SERVICE_FILE="$HOME/.config/systemd/user/voice-input-daemon.service"
+    mkdir -p "$HOME/.config/systemd/user"
+
+    cat > "$SERVICE_FILE" << EOF
 [Unit]
 Description=Voice Input Daemon (Whisper)
 After=default.target
@@ -164,20 +135,25 @@ RestartSec=10
 WantedBy=default.target
 EOF
 
-        systemctl --user daemon-reload
-        systemctl --user enable voice-input-daemon
-        systemctl --user start voice-input-daemon
+    systemctl --user daemon-reload
+    systemctl --user enable voice-input-daemon
+    systemctl --user start voice-input-daemon
 
-        echo -e "${GREEN}✓ 守护进程已启动${NC}"
+    echo -e "${GREEN}✓ 守护进程模式已启用${NC}"
+else
+    # 如果守护进程存在，停止它
+    if systemctl --user is-active --quiet voice-input-daemon 2>/dev/null; then
+        systemctl --user stop voice-input-daemon
+        systemctl --user disable voice-input-daemon
+        echo -e "${GREEN}✓ 守护进程已停止${NC}"
     fi
+    echo -e "${GREEN}✓ 普通模式已启用${NC}"
 fi
 
-# 配置讯飞云
-if [ "$INSTALL_XFYUN" = true ]; then
-    echo ""
-    echo -e "${BLUE}讯飞云配置：${NC}"
-    echo "稍后可运行 ./xfyun/setup_xfyun.sh 配置 API 密钥"
-fi
+# 讯飞云配置提示
+echo ""
+echo -e "${BLUE}讯飞云配置：${NC}"
+echo "稍后可运行 ./xfyun/setup_xfyun.sh 配置 API 密钥"
 
 echo ""
 
@@ -187,56 +163,53 @@ read -p "是否自动配置 GNOME 快捷键？[y/N] " -n 1 -r
 echo ""
 
 if [[ $REPLY =~ ^[Yy]$ ]]; then
-    # 确定使用哪个脚本
-    if [ "$INSTALL_LOCAL" = true ] && [ "$INSTALL_XFYUN" = true ]; then
-        echo "检测到双方案，请选择默认快捷键："
-        echo "1) 本地 Whisper (普通模式)"
-        echo "2) 本地 Whisper (快速模式，需守护进程)"
-        echo "3) 讯飞云"
-        read -p "选择 [1-3]: " KEY_CHOICE
-
-        case $KEY_CHOICE in
-            1) WRAPPER_SCRIPT="$SCRIPT_DIR/local/voice_input_wrapper.sh" ;;
-            2) WRAPPER_SCRIPT="$SCRIPT_DIR/local/voice_input_fast.sh" ;;
-            3) WRAPPER_SCRIPT="$SCRIPT_DIR/xfyun/voice_input_wrapper_xfyun.sh" ;;
-            *) WRAPPER_SCRIPT="$SCRIPT_DIR/local/voice_input_wrapper.sh" ;;
-        esac
-    elif [ "$INSTALL_LOCAL" = true ]; then
-        # 如果启用了守护进程，默认使用快速模式
-        if [ "$DAEMON_ENABLED" = true ]; then
-            WRAPPER_SCRIPT="$SCRIPT_DIR/local/voice_input_fast.sh"
-        else
-            WRAPPER_SCRIPT="$SCRIPT_DIR/local/voice_input_wrapper.sh"
-        fi
+    # 确定本地方案使用哪个脚本
+    if [ "$DAEMON_ENABLED" = true ]; then
+        LOCAL_SCRIPT="$SCRIPT_DIR/local/voice_input_fast.sh"
     else
-        WRAPPER_SCRIPT="$SCRIPT_DIR/xfyun/voice_input_wrapper_xfyun.sh"
+        LOCAL_SCRIPT="$SCRIPT_DIR/local/voice_input_wrapper.sh"
     fi
+    XFYUN_SCRIPT="$SCRIPT_DIR/xfyun/voice_input_wrapper_xfyun.sh"
 
-    echo "配置快捷键为: Super+V"
+    echo "配置双方案快捷键："
+    echo "  Super+V       → 本地 Whisper"
+    echo "  Super+Shift+V → 讯飞云"
 
-    # 配置 GNOME 快捷键（不覆盖已有快捷键）
+    # 获取当前快捷键列表
     CURRENT=$(gsettings get org.gnome.settings-daemon.plugins.media-keys custom-keybindings)
 
-    # 检查是否已包含 voice-input
-    if ! echo "$CURRENT" | grep -q "voice-input"; then
-        # 添加到现有列表
+    # 添加 voice-input-local
+    if ! echo "$CURRENT" | grep -q "voice-input-local"; then
         if [[ "$CURRENT" == "@as []" ]]; then
-            # 当前为空，直接设置
-            NEW_LIST="['/org/gnome/settings-daemon/plugins/media-keys/custom-keybindings/voice-input/']"
+            NEW_LIST="['/org/gnome/settings-daemon/plugins/media-keys/custom-keybindings/voice-input-local/']"
         else
-            # 追加到现有列表
             TEMP="${CURRENT%]}"
-            NEW_LIST="${TEMP}, '/org/gnome/settings-daemon/plugins/media-keys/custom-keybindings/voice-input/']"
+            NEW_LIST="${TEMP}, '/org/gnome/settings-daemon/plugins/media-keys/custom-keybindings/voice-input-local/']"
         fi
-        gsettings set org.gnome.settings-daemon.plugins.media-keys custom-keybindings "$NEW_LIST"
+        CURRENT="$NEW_LIST"
     fi
 
-    # 配置快捷键内容
-    gsettings set org.gnome.settings-daemon.plugins.media-keys.custom-keybinding:/org/gnome/settings-daemon/plugins/media-keys/custom-keybindings/voice-input/ name '语音输入'
-    gsettings set org.gnome.settings-daemon.plugins.media-keys.custom-keybinding:/org/gnome/settings-daemon/plugins/media-keys/custom-keybindings/voice-input/ command "$WRAPPER_SCRIPT"
-    gsettings set org.gnome.settings-daemon.plugins.media-keys.custom-keybinding:/org/gnome/settings-daemon/plugins/media-keys/custom-keybindings/voice-input/ binding '<Super>v'
+    # 添加 voice-input-xfyun
+    if ! echo "$CURRENT" | grep -q "voice-input-xfyun"; then
+        TEMP="${CURRENT%]}"
+        NEW_LIST="${TEMP}, '/org/gnome/settings-daemon/plugins/media-keys/custom-keybindings/voice-input-xfyun/']"
+        CURRENT="$NEW_LIST"
+    fi
 
-    echo -e "${GREEN}✓ 快捷键配置完成 (Super+V)${NC}"
+    # 设置快捷键列表
+    gsettings set org.gnome.settings-daemon.plugins.media-keys custom-keybindings "$CURRENT"
+
+    # 配置本地方案快捷键
+    gsettings set org.gnome.settings-daemon.plugins.media-keys.custom-keybinding:/org/gnome/settings-daemon/plugins/media-keys/custom-keybindings/voice-input-local/ name '语音输入(本地)'
+    gsettings set org.gnome.settings-daemon.plugins.media-keys.custom-keybinding:/org/gnome/settings-daemon/plugins/media-keys/custom-keybindings/voice-input-local/ command "$LOCAL_SCRIPT"
+    gsettings set org.gnome.settings-daemon.plugins.media-keys.custom-keybinding:/org/gnome/settings-daemon/plugins/media-keys/custom-keybindings/voice-input-local/ binding '<Super>v'
+
+    # 配置讯飞云快捷键
+    gsettings set org.gnome.settings-daemon.plugins.media-keys.custom-keybinding:/org/gnome/settings-daemon/plugins/media-keys/custom-keybindings/voice-input-xfyun/ name '语音输入(讯飞云)'
+    gsettings set org.gnome.settings-daemon.plugins.media-keys.custom-keybinding:/org/gnome/settings-daemon/plugins/media-keys/custom-keybindings/voice-input-xfyun/ command "$XFYUN_SCRIPT"
+    gsettings set org.gnome.settings-daemon.plugins.media-keys.custom-keybinding:/org/gnome/settings-daemon/plugins/media-keys/custom-keybindings/voice-input-xfyun/ binding '<Shift><Super>v'
+
+    echo -e "${GREEN}✓ 快捷键配置完成${NC}"
 else
     echo "跳过快捷键配置"
 fi
@@ -248,49 +221,46 @@ echo -e "${GREEN}========================================${NC}"
 echo -e "${GREEN}  安装完成！${NC}"
 echo -e "${GREEN}========================================${NC}\n"
 
-echo -e "已安装的方案："
-if [ "$INSTALL_LOCAL" = true ]; then
-    echo -e "  ${GREEN}✓${NC} 本地 Whisper"
-    echo -e "    - 普通模式: ${BLUE}$SCRIPT_DIR/local/voice_input_wrapper.sh${NC}"
-    echo -e "    - 快速模式: ${BLUE}$SCRIPT_DIR/local/voice_input_fast.sh${NC} (需守护进程)"
-    echo -e "    - 模式切换: ${BLUE}$SCRIPT_DIR/local/switch_mode.sh${NC}"
-fi
-if [ "$INSTALL_XFYUN" = true ]; then
-    echo -e "  ${GREEN}✓${NC} 讯飞云"
-    echo -e "    - 使用: ${BLUE}$SCRIPT_DIR/xfyun/voice_input_wrapper_xfyun.sh${NC}"
-    echo -e "    - 配置: ${BLUE}$SCRIPT_DIR/xfyun/setup_xfyun.sh${NC}"
-fi
-
+echo -e "已安装方案：双方案（本地 Whisper + 讯飞云）"
 echo ""
+
+echo -e "${GREEN}本地 Whisper:${NC}"
+if [ "$DAEMON_ENABLED" = true ]; then
+    echo -e "  - 模式: ${BLUE}守护进程（快速启动）${NC}"
+    echo -e "  - 快捷键: ${BLUE}Super+V${NC}"
+    echo -e "  - 守护进程管理: ${BLUE}systemctl --user status/stop/start voice-input-daemon${NC}"
+else
+    echo -e "  - 模式: ${BLUE}普通模式${NC}"
+    echo -e "  - 快捷键: ${BLUE}Super+V${NC}"
+fi
+echo -e "  - 模式切换: ${BLUE}./local/switch_mode.sh${NC}"
+echo ""
+
+echo -e "${GREEN}讯飞云:${NC}"
+echo -e "  - 快捷键: ${BLUE}Super+Shift+V${NC}"
+echo -e "  - API配置: ${BLUE}./xfyun/setup_xfyun.sh${NC}"
+echo ""
+
 echo -e "${BLUE}下一步操作：${NC}"
-
-STEP=1
-if [ "$INSTALL_XFYUN" = true ]; then
-    echo -e "${STEP}. 配置讯飞云 API 密钥:"
-    echo -e "   ${BLUE}cd xfyun && ./setup_xfyun.sh${NC}"
-    echo ""
-    STEP=$((STEP + 1))
-fi
-
-echo -e "${STEP}. 测试语音输入:"
-if [ "$INSTALL_LOCAL" = true ]; then
-    echo -e "   ${BLUE}./local/voice_input_wrapper.sh${NC}"
-fi
-if [ "$INSTALL_XFYUN" = true ]; then
-    echo -e "   ${BLUE}./xfyun/voice_input_wrapper_xfyun.sh${NC}"
-fi
 echo ""
-STEP=$((STEP + 1))
-
-echo -e "${STEP}. 查看详细文档:"
+echo "1. 配置讯飞云 API 密钥（首次使用讯飞云时）:"
+echo -e "   ${BLUE}cd xfyun && ./setup_xfyun.sh${NC}"
+echo ""
+echo "2. 测试语音输入:"
+echo -e "   本地: 按 ${BLUE}Super+V${NC}"
+echo -e "   讯飞云: 按 ${BLUE}Super+Shift+V${NC}"
+echo ""
+echo "3. 切换本地方案模式:"
+echo -e "   ${BLUE}./local/switch_mode.sh${NC}"
+echo ""
+echo "4. 查看详细文档:"
 echo -e "   总览: ${BLUE}README.md${NC}"
-if [ "$INSTALL_LOCAL" = true ]; then
-    echo -e "   本地方案: ${BLUE}docs/LOCAL.md${NC}"
-fi
-if [ "$INSTALL_XFYUN" = true ]; then
-    echo -e "   讯飞云方案: ${BLUE}docs/XFYUN.md${NC}"
-fi
+echo -e "   本地方案: ${BLUE}docs/LOCAL.md${NC}"
+echo -e "   讯飞云方案: ${BLUE}docs/XFYUN.md${NC}"
 echo -e "   常见问题: ${BLUE}docs/FAQ.md${NC}"
+echo ""
+echo "5. 卸载:"
+echo -e "   ${BLUE}./uninstall.sh${NC}"
 
 echo ""
 echo -e "${YELLOW}提示: 所有脚本都使用项目目录下的 venv/ 虚拟环境${NC}"

@@ -11,16 +11,19 @@ YELLOW='\033[1;33m'
 BLUE='\033[0;34m'
 NC='\033[0m' # No Color
 
+# 获取项目根目录
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+
 # 快捷键路径
-KEYBINDING_PATH="org.gnome.settings-daemon.plugins.media-keys.custom-keybinding:/org/gnome/settings-daemon/plugins/media-keys/custom-keybindings/custom6/"
+KEYBINDING_PATH="org.gnome.settings-daemon.plugins.media-keys.custom-keybinding:/org/gnome/settings-daemon/plugins/media-keys/custom-keybindings/voice-input-local/"
 
 # 脚本路径
-DAEMON_SCRIPT="$HOME/bin/tools/voice_input/local/voice_input_fast.sh"
-NORMAL_SCRIPT="$HOME/bin/tools/voice_input/local/voice_input_wrapper.sh"
+DAEMON_SCRIPT="$SCRIPT_DIR/local/voice_input_fast.sh"
+NORMAL_SCRIPT="$SCRIPT_DIR/local/voice_input_wrapper.sh"
 
 # 检测当前模式
 check_current_mode() {
-    local current_command=$(gsettings get org.gnome.settings-daemon.plugins.media-keys.custom-keybinding:/org/gnome/settings-daemon/plugins/media-keys/custom-keybindings/custom6/ command 2>/dev/null | tr -d "'")
+    local current_command=$(gsettings get $KEYBINDING_PATH command 2>/dev/null | tr -d "'")
     local daemon_running=$(systemctl --user is-active voice-input-daemon 2>/dev/null || echo "inactive")
 
     echo -e "${BLUE}=== 当前语音输入模式 ===${NC}\n"
@@ -53,8 +56,32 @@ check_current_mode() {
 switch_to_daemon() {
     echo -e "${BLUE}=== 切换到守护进程模式 ===${NC}\n"
 
-    # 1. 启动守护进程
-    echo "1. 启动守护进程..."
+    # 1. 检查并创建 systemd service 文件
+    SERVICE_FILE="$HOME/.config/systemd/user/voice-input-daemon.service"
+    if [ ! -f "$SERVICE_FILE" ]; then
+        echo "1. 创建 systemd service 文件..."
+        mkdir -p "$HOME/.config/systemd/user"
+
+        cat > "$SERVICE_FILE" << EOF
+[Unit]
+Description=Voice Input Daemon (Whisper)
+After=default.target
+
+[Service]
+Type=simple
+ExecStart=$SCRIPT_DIR/venv/bin/python3 $SCRIPT_DIR/local/voice_input_daemon.py
+Restart=on-failure
+RestartSec=10
+
+[Install]
+WantedBy=default.target
+EOF
+        echo -e "   ${GREEN}✓${NC} Service 文件已创建"
+        systemctl --user daemon-reload
+    fi
+
+    # 2. 启动守护进程
+    echo "2. 启动守护进程..."
     systemctl --user start voice-input-daemon
     systemctl --user enable voice-input-daemon
     sleep 2
@@ -68,9 +95,9 @@ switch_to_daemon() {
         exit 1
     fi
 
-    # 2. 更新快捷键
-    echo "2. 更新快捷键配置..."
-    gsettings set org.gnome.settings-daemon.plugins.media-keys.custom-keybinding:/org/gnome/settings-daemon/plugins/media-keys/custom-keybindings/custom6/ command "$DAEMON_SCRIPT"
+    # 3. 更新快捷键
+    echo "3. 更新快捷键配置..."
+    gsettings set $KEYBINDING_PATH command "$DAEMON_SCRIPT"
     echo -e "   ${GREEN}✓${NC} 快捷键已更新为守护进程模式"
 
     echo ""
@@ -96,7 +123,7 @@ switch_to_normal() {
 
     # 2. 更新快捷键
     echo "2. 更新快捷键配置..."
-    gsettings set org.gnome.settings-daemon.plugins.media-keys.custom-keybinding:/org/gnome/settings-daemon/plugins/media-keys/custom-keybindings/custom6/ command "$NORMAL_SCRIPT"
+    gsettings set $KEYBINDING_PATH command "$NORMAL_SCRIPT"
     echo -e "   ${GREEN}✓${NC} 快捷键已更新为普通模式"
 
     echo ""
@@ -131,7 +158,7 @@ show_help() {
 
 # 自动切换模式
 toggle_mode() {
-    local current_command=$(gsettings get org.gnome.settings-daemon.plugins.media-keys.custom-keybinding:/org/gnome/settings-daemon/plugins/media-keys/custom-keybindings/custom6/ command 2>/dev/null | tr -d "'")
+    local current_command=$(gsettings get $KEYBINDING_PATH command 2>/dev/null | tr -d "'")
 
     if [[ "$current_command" == *"voice_input_fast.sh"* ]]; then
         # 当前是守护进程模式，切换到普通模式
